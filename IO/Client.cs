@@ -24,6 +24,12 @@ namespace UT.Data.IO
         #endregion //Constructors
 
         #region Public Methods
+        public T? Send<T>(T obj)
+            where T : class
+        {
+            return Serializer<T>.Deserialize(this.Send(Serializer<T>.Serialize(obj)));
+        }
+
         public byte[] Send(byte[] data)
         {
             TcpClient client = new TcpClient();
