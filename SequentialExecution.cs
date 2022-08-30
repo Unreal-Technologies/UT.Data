@@ -17,6 +17,7 @@
         public bool IsValid
         {
             get { return this.isValid; }
+            set { this.isValid = value; }
         }
         #endregion //Properties
 
