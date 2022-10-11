@@ -5,7 +5,9 @@ namespace UT.Data.Modlet
     public interface IModlet
     {
         public void OnSequentialExecutionConfiguration(SequentialExecution se);
-        public void OnClientConfiguration(Client client);
-        public void OnServerConfiguration(Server server);
+        public void OnClientConfiguration(ModletClient client);
+        public void OnServerConfiguration(ModletServer server);
+        public void OnGlobalServerAction(byte[]? stream);
+        public byte[]? OnLocalServerAction(byte[]? stream);
     }
 }
