@@ -7,7 +7,7 @@ namespace UT.Data.Modlet
         #region Properties
         public ModletCommands.Commands Command { get; set; }
         public byte[]? Data { get; set; }
-        public byte[]? Module { get; private set; }
+        public byte[]? Module { get; set; }
         #endregion //Properties
 
         #region Constructors
@@ -21,7 +21,7 @@ namespace UT.Data.Modlet
             this.Data = data;
             if (module != null)
             {
-                string? type = module.GetType().FullName;
+                string? type = module.GetType().AssemblyQualifiedName;
 
                 this.Module = type == null ? null : ASCIIEncoding.UTF8.GetBytes(type);
             }

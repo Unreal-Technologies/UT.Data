@@ -7,7 +7,8 @@ namespace UT.Data.Modlet
     public class ModletServer : Server
     {
         #region Members
-        private Dictionary<string, string> keys;
+        private Dictionary<string, string>? keys;
+        private List<IModlet>? modules;
         private int semiRand;
         #endregion //Members
 
@@ -33,6 +34,18 @@ namespace UT.Data.Modlet
         }
         #endregion //Constructors
 
+        #region Public Methods
+        public bool Register(IModlet module)
+        {
+            if(this.modules == null)
+            {
+                return false;
+            }
+            this.modules.Add(module);
+            return true;
+        }
+        #endregion //Public Methods
+
         #region Private Methods
         private void ConstructExtension()
         {
@@ -40,16 +53,18 @@ namespace UT.Data.Modlet
 
             this.keys = new Dictionary<string, string>();
             this.semiRand = rnd.Next(0xffff);
+            this.modules = new List<IModlet>();
             this.OnDataReceived += ModletServer_OnDataReceived;
         }
 
         private byte[] ModletServer_OnDataReceived(byte[] data, EndPoint? ep, Server server)
         {
             Dataset? dsIn = Serializer<Dataset>.Deserialize(data);
-            if (dsIn == null)
+            if (dsIn == null || this.keys == null || ep == null || this.modules == null)
             {
                 return Array.Empty<byte>();
             }
+            string lockKey = ep.ToString()?.Split(':')[0] ?? string.Empty;
 
             Dataset dsOut;
             switch (dsIn.Command)
@@ -58,14 +73,14 @@ namespace UT.Data.Modlet
                     dsOut = new Dataset(ModletCommands.Commands.Response, Array.Empty<byte>(), null);
                     break;
                 case ModletCommands.Commands.Serverkey:
-                    if (dsIn.Data == null || ep == null)
+                    if (dsIn.Data == null)
                     {
                         return Array.Empty<byte>();
                     }
-                    string computer = ASCIIEncoding.UTF8.GetString(dsIn.Data);
-                    string lockKey = ep.ToString()?.Split(':')[0] ?? string.Empty;
 
+                    string computer = ASCIIEncoding.UTF8.GetString(dsIn.Data);
                     string key;
+
                     if (this.keys.ContainsKey(lockKey))
                     {
                         key = this.keys[lockKey];
@@ -79,10 +94,37 @@ namespace UT.Data.Modlet
                     }
                     dsOut = new Dataset(ModletCommands.Commands.Response, ASCIIEncoding.UTF8.GetBytes(key), null);
                     break;
+                case ModletCommands.Commands.Action:
+                    byte[]? module = dsIn.Module;
+                    byte[]? stream = dsIn.Data;
+                    byte[]? output = null;
+                    Type? type = null;
+                    if(module != null)
+                    {
+                        type = Type.GetType(ASCIIEncoding.UTF8.GetString(module));
+                    }
+
+                    if(type == null)
+                    {
+                        foreach(IModlet m in this.modules)
+                        {
+                            m.OnGlobalServerAction(stream);
+                        }
+                    }
+                    else
+                    {
+                        IModlet? m = this.modules.Where(x => x.GetType().AssemblyQualifiedName == type.AssemblyQualifiedName).FirstOrDefault();
+                        if(m != null)
+                        {
+                            output = m.OnLocalServerAction(stream);
+                        }
+                    }
+
+                    dsOut = new Dataset(ModletCommands.Commands.Response, output, null);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
-
 
             if(dsOut == null)
             {

@@ -30,7 +30,7 @@ namespace UT.Data.Modlet
         {
             if(this.Aes != null)
             {
-                throw new NotImplementedException("Encode data to AES with KEY");
+                //throw new NotImplementedException("Encode data to AES with KEY");
             }
             Dataset dsIn = new(command, data, module);
             Dataset? dsOut = base.Send<Dataset>(dsIn);
