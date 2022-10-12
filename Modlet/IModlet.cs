@@ -6,7 +6,6 @@ namespace UT.Data.Modlet
     {
         public void OnSequentialExecutionConfiguration(SequentialExecution se);
         public void OnClientConfiguration(ModletClient client);
-        public void OnServerConfiguration(ModletServer server);
         public void OnGlobalServerAction(byte[]? stream);
         public byte[]? OnLocalServerAction(byte[]? stream);
     }
