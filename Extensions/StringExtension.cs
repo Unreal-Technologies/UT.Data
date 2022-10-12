@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using UT.Data.Attributes;
 
@@ -26,6 +27,24 @@ namespace UT.Data.Extensions
         public static byte[] AsBytes(this string value)
         {
             return (new ASCIIEncoding()).GetBytes(value);
+        }
+
+        public static string Md5(this string value, bool lowercase = true)
+        {
+            MD5 md5 = MD5.Create();
+            byte[] input = value.AsBytes();
+            byte[] hash = md5.ComputeHash(input);
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in hash)
+            {
+                sb.Append(b.ToString("X2"));
+            }
+
+            if (lowercase)
+            {
+                return sb.ToString().ToLower();
+            }
+            return sb.ToString();
         }
 
         public static T? AsEnum<T>(this string value)

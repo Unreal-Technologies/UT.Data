@@ -22,7 +22,6 @@ namespace UT.Data.Modlet
             if (module != null)
             {
                 string? type = module.GetType().AssemblyQualifiedName;
-
                 this.Module = type == null ? null : ASCIIEncoding.UTF8.GetBytes(type);
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using UT.Data.IO;
 using System.Text;
+using UT.Data.Encryption;
 
 namespace UT.Data.Modlet
 {
@@ -97,6 +98,11 @@ namespace UT.Data.Modlet
                 case ModletCommands.Commands.Action:
                     byte[]? module = dsIn.Module;
                     byte[]? stream = dsIn.Data;
+                    string aeskey = this.keys[lockKey];
+                    if(stream != null)
+                    {
+                        stream = Aes.Decrypt(stream, aeskey);
+                    }
                     byte[]? output = null;
                     Type? type = null;
                     if(module != null)
@@ -120,6 +126,10 @@ namespace UT.Data.Modlet
                         }
                     }
 
+                    if(output != null)
+                    {
+                        output = Aes.Encrypt(output, aeskey);
+                    }
                     dsOut = new Dataset(ModletCommands.Commands.Response, output, null);
                     break;
                 default:

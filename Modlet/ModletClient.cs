@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using UT.Data.Extensions;
 using UT.Data.IO;
 
 namespace UT.Data.Modlet
@@ -6,7 +7,7 @@ namespace UT.Data.Modlet
     public class ModletClient : Client
     {
         #region Properties
-        public byte[]? Aes { get; set; }
+        public string? Aes { get; set; }
         #endregion //Properties
 
         #region Constructors
@@ -28,9 +29,9 @@ namespace UT.Data.Modlet
         #region Public Methods
         public byte[]? Send(byte[]? data, ModletCommands.Commands command, IModlet? module)
         {
-            if(this.Aes != null)
+            if(data != null && this.Aes != null)
             {
-                //throw new NotImplementedException("Encode data to AES with KEY");
+                data = Encryption.Aes.Encrypt(data, this.Aes);
             }
             Dataset dsIn = new(command, data, module);
             Dataset? dsOut = base.Send<Dataset>(dsIn);
@@ -38,7 +39,12 @@ namespace UT.Data.Modlet
             {
                 return null;
             }
-            return dsOut.Data;
+            byte[]? output = dsOut.Data;
+            if(output != null && this.Aes != null)
+            {
+                output = Encryption.Aes.Decrypt(output, this.Aes);
+            }
+            return output;
         }
 
         public byte[]? Send(ModletCommands.Commands command, IModlet? module)
