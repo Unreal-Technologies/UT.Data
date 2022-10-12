@@ -4,11 +4,12 @@ namespace UT.Data
 {
     public class ExtendedConsole
     {
+        #region Public Methods
         public static void WriteLine(string text)
         {
             ConsoleColor baseColor = Console.ForegroundColor;
 
-            List<ConsoleColor> colors = new List<ConsoleColor>();
+            List<ConsoleColor> colors = new();
             foreach(Match match in Regex.Matches(text, @"\<[a-z]+\>", RegexOptions.IgnoreCase))
             {
                 string txtMatch = match.Value;
@@ -65,7 +66,9 @@ namespace UT.Data
             Console.WriteLine("");
             Console.ForegroundColor = baseColor;
         }
+        #endregion //Public Methods
 
+        #region Private Methods
         private static ConsoleColor[] Colors()
         {
             return new ConsoleColor[]
@@ -88,5 +91,6 @@ namespace UT.Data
                 ConsoleColor.Yellow
             };
         }
+        #endregion //Private Methods
     }
 }

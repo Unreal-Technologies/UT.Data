@@ -80,14 +80,14 @@ namespace UT.Data.Encryption
             ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
             using (MemoryStream ms = new(text))
             {
-                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                using (CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read))
                 {
-                    byte[] buffer = new byte[100];
+                    byte[] buffer = new byte[1024];
                     int k = 0;
                     while ((k = cs.Read(buffer, 0, buffer.Length)) != 0)
                     {
                         value.Write(buffer, 0, k);
-                        if(k < 100)
+                        if(k < buffer.Length)
                         {
                             continue;
                         }
@@ -125,7 +125,6 @@ namespace UT.Data.Encryption
             }
             byte[] encoded = ms.ToArray();
             ms.Close();
-
 
             return encoded;
         }

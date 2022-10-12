@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using UT.Data.Extensions;
 
 namespace UT.Data.Modlet
 {
@@ -32,12 +33,12 @@ namespace UT.Data.Modlet
                 }
             }
 
-            return buffer.ToArray();
+            return buffer.OrderBy(x => x.GetAttribute<PositionAttribute>()?.Position ?? int.MaxValue).ThenBy(x => x.GetType().AssemblyQualifiedName).ToArray();
         }
 
         private static Assembly[] GetAssemblies()
         {
-            List<Assembly> assemblies = new List<Assembly>();
+            List<Assembly> assemblies = new();
             assemblies.Add(Assembly.GetExecutingAssembly());
 
             Assembly? entryAssem = Assembly.GetEntryAssembly();

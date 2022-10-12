@@ -6,6 +6,7 @@
         private readonly List<Tuple<Task, string>> tasks;
         private int position;
         private bool isValid;
+        private readonly Form? parent;
         #endregion //Members
 
         #region Delegates
@@ -14,6 +15,11 @@
         #endregion //Delegates
 
         #region Properties
+        public Form? Parent
+        {
+            get { return this.parent; }
+        }
+
         public bool IsValid
         {
             get { return this.isValid; }
@@ -26,18 +32,33 @@
         #endregion //Events
 
         #region Constructors
-        public SequentialExecution()
+        public SequentialExecution(Form? parent)
         {
             this.tasks = new List<Tuple<Task, string>>();
             this.position = 0;
             this.isValid = true;
+            this.parent = parent;
         }
         #endregion //Constructors
 
         #region Public Methods
-        public void Add(Task task, string title)
+        public void Add(Task task, string title, int? position = null)
         {
-            this.tasks.Add(new Tuple<Task, string>(task, title));
+            if (position == null)
+            {
+                this.tasks.Add(new Tuple<Task, string>(task, title));
+            }
+            else
+            {
+                int pos = (int)position < 0 ? this.tasks.Count + (int)position : (int)position;
+                Tuple<Task, string>[] left = this.tasks.Take(pos).ToArray();
+                Tuple<Task, string>[] right = this.tasks.Skip(pos).ToArray();
+
+                this.tasks.Clear();
+                this.tasks.AddRange(left);
+                this.tasks.Add(new Tuple<Task, string>(task, title));
+                this.tasks.AddRange(right);
+            }
         }
 
         public void Start()
