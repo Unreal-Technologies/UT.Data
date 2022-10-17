@@ -34,7 +34,7 @@ namespace UT.Data.Extensions
             MD5 md5 = MD5.Create();
             byte[] input = value.AsBytes();
             byte[] hash = md5.ComputeHash(input);
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             foreach (byte b in hash)
             {
                 sb.Append(b.ToString("X2"));
