@@ -35,8 +35,11 @@
             foreach (T branch in branches)
             {
                 Branch<T> b = new(branch);
-                b.AddBranches(data);
-                this.branches.Add(b);
+                if (!this.branches.Contains(b) && this.branches.Where(x => x.ordinal.Equals(this.ordinal)).FirstOrDefault() == null)
+                {
+                    b.AddBranches(data);
+                    this.branches.Add(b);
+                }
             }
         }
         #endregion //Public Methods

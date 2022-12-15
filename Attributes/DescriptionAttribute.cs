@@ -1,6 +1,6 @@
 ﻿namespace UT.Data.Attributes
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
     public class DescriptionAttribute : Attribute
     {
         #region Members
