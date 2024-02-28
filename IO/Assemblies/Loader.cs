@@ -8,10 +8,10 @@ namespace UT.Data.IO.Assemblies
     public class Loader
     {
         #region Public Methods
-        public static T[] GetInstances<T>()
+        public static T[] GetInstances<T>(bool byRequirements = true)
             where T : class
         {
-            List<T> buffer = new();
+            List<T> buffer = [];
             Assembly[] assemblies = Loader.GetAssemblies<T>();
             bool isInterface = typeof(T).IsInterface;
 
@@ -42,8 +42,11 @@ namespace UT.Data.IO.Assemblies
                 }
             }
 
-            T[] ordinal = buffer.OrderBy(x => x.GetAttribute<PositionAttribute>()?.Position ?? int.MaxValue).ThenBy(x => x.GetType().AssemblyQualifiedName).ToArray();
-
+            T[] ordinal = [.. buffer.OrderBy(x => x.GetAttribute<PositionAttribute>()?.Position ?? int.MaxValue).ThenBy(x => x.GetType().AssemblyQualifiedName)];
+            if(!byRequirements)
+            {
+                return ordinal;
+            }
             return Loader.GetInstancesOrdinalByRequirements<T>(ordinal);
         }
 
@@ -96,13 +99,13 @@ namespace UT.Data.IO.Assemblies
         private static T[] GetInstancesOrdinalByRequirements<T>(T[] list)
             where T : class
         {
-            Dictionary<int, int[]> parents = new();
+            Dictionary<int, int[]> parents = [];
             foreach(T item in list)
             {
                 PositionAttribute? position = item.GetAttribute<PositionAttribute>();
                 if (position != null)
                 {
-                    List<int> pBuffer = new();
+                    List<int> pBuffer = [];
                     foreach(Type t in Loader.GetValidTypes<T>(position.Requires))
                     {
                         T? parent = list.Where(x => x.GetType() == t).FirstOrDefault();
@@ -112,20 +115,21 @@ namespace UT.Data.IO.Assemblies
                             pBuffer.Add(pIdx);
                         }
                     }
-                    parents.Add(Array.IndexOf(list, item), pBuffer.ToArray());
+                    parents.Add(Array.IndexOf(list, item), [.. pBuffer]);
                 }
                 else
                 {
+                    
                     throw new NotImplementedException();
                 }
             }
 
-            List<T> buffer = new();
+            List<T> buffer = [];
             Tree<int>[] trees = Tree<int>.Create(parents);
 
             Loader.FillBuffer(buffer, trees, list);
 
-            return buffer.ToArray();
+            return [.. buffer];
         }
 
         private static void FillBuffer<T>(List<T> buffer, Branch<int>[] branches, T[] list)

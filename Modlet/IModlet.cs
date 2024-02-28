@@ -6,6 +6,6 @@
         public void OnClientConfiguration(ModletClient client);
         public void OnGlobalServerAction(byte[]? stream);
         public byte[]? OnLocalServerAction(byte[]? stream);
-        public void OnServerConfiguration(ref Dictionary<string, object> configuration);
+        public void OnServerConfiguration(ref Dictionary<string, object?> configuration);
     }
 }

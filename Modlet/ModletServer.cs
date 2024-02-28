@@ -36,7 +36,7 @@ namespace UT.Data.Modlet
         #endregion //Constructors
 
         #region Public Methods
-        public bool Register(IModlet module, ref Dictionary<string, object> configuration)
+        public bool Register(IModlet module, ref Dictionary<string, object?> configuration)
         {
             if(this.modules == null)
             {
