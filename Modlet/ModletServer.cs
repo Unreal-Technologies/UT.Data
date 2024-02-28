@@ -36,12 +36,13 @@ namespace UT.Data.Modlet
         #endregion //Constructors
 
         #region Public Methods
-        public bool Register(IModlet module)
+        public bool Register(IModlet module, ref Dictionary<string, object> configuration)
         {
             if(this.modules == null)
             {
                 return false;
             }
+            module.OnServerConfiguration(ref configuration);
             this.modules.Add(module);
             return true;
         }
@@ -52,9 +53,9 @@ namespace UT.Data.Modlet
         {
             Random rnd = new((int)DateTime.Now.Ticks);
 
-            this.keys = new Dictionary<string, string>();
+            this.keys = [];
             this.semiRand = rnd.Next(0xffff);
-            this.modules = new List<IModlet>();
+            this.modules = [];
             this.OnDataReceived += ModletServer_OnDataReceived;
         }
 

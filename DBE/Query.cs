@@ -18,7 +18,7 @@ namespace UT.Data.DBE
         #endregion //Enums
 
         #region Members
-        private readonly IQueryable queryable;
+        private readonly IDatabaseConnection queryable;
         private readonly List<LambdaExpression> select;
         private readonly List<Tuple<Joins, LambdaExpression>> join;
         private Type? from;
@@ -48,7 +48,7 @@ namespace UT.Data.DBE
         #endregion //Properties
 
         #region Constructors
-        public Query(IQueryable queryable)
+        public Query(IDatabaseConnection queryable)
         {
             this.queryable = queryable;
             this.select = [];

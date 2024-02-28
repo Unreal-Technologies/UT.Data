@@ -1,6 +1,4 @@
-﻿using UT.Data.IO;
-
-namespace UT.Data.Modlet
+﻿namespace UT.Data.Modlet
 {
     public interface IModlet
     {
@@ -8,5 +6,6 @@ namespace UT.Data.Modlet
         public void OnClientConfiguration(ModletClient client);
         public void OnGlobalServerAction(byte[]? stream);
         public byte[]? OnLocalServerAction(byte[]? stream);
+        public void OnServerConfiguration(ref Dictionary<string, object> configuration);
     }
 }

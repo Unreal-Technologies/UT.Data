@@ -1,11 +1,10 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using UT.Data.Attributes;
-using UT.Data.Extensions;
 
 namespace UT.Data.DBE
 {
-    public class Mysql : IQueryable
+    public class Mysql : IQueryable, IDatabaseConnection
     {
         #region Implementations
         public object[]? Execute(Query query)
