@@ -7,6 +7,22 @@ namespace UT.Data
     public class Network
     {
         #region Public Methods
+        public static bool IsServerReachable(IPAddress ip, int port)
+        {
+            TcpClient tcpClient = new();
+            try
+            {
+                tcpClient.Connect(ip, port);
+                tcpClient.Close();
+
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
+
         public static IPAddress[] LocalIPv4(NetworkInterfaceType nit)
         {
             List<IPAddress> buffer = [];

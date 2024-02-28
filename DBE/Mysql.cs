@@ -1,12 +1,27 @@
 ﻿using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
 using UT.Data.Attributes;
 
 namespace UT.Data.DBE
 {
+    [Default("Server", "127.0.0.1")]
+    [Default("Port", "3306")]
+    [Default("Username", "root")]
+    [Default("Password", "")]
     public class Mysql : IQueryable, IDatabaseConnection
     {
         #region Implementations
+        public bool Connect(IPAddress ip, int port, string database, string username, string password)
+        {
+            return true;
+        }
+
+        public bool Close()
+        {
+            return false;
+        }
+
         public object[]? Execute(Query query)
         {
             string q = this.Compose(query);
@@ -16,7 +31,7 @@ namespace UT.Data.DBE
 
         public string Compose(Query query)
         {
-            List<string> queryBuffer = new();
+            List<string> queryBuffer = [];
             if(query.ISelect.Count() != 0)
             {
                 queryBuffer.Add("select");
@@ -163,7 +178,6 @@ namespace UT.Data.DBE
             }
             return String.Empty;
         }
-
         #endregion //Private Methods
     }
 }
