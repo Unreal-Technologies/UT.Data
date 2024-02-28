@@ -51,49 +51,59 @@ namespace UT.Data.DBE
         public Query(IQueryable queryable)
         {
             this.queryable = queryable;
-            this.select = new List<LambdaExpression>();
-            this.join = new List<Tuple<Joins, LambdaExpression>>();
+            this.select = [];
+            this.join = [];
         }
         #endregion //Constructors
 
         #region Public Methods
-        public void Select<Ttable, Treturn>(Expression<Func<Ttable, Treturn>> fnc)
+        public object[]? Execute()
+        {
+            return this.queryable.Execute(this);
+        }
+
+        public Query Select<Ttable, Treturn>(Expression<Func<Ttable, Treturn>> fnc)
             where Ttable : ITable
-            where Treturn : class
         {
             this.select.Add(fnc);
+            return this;
         }
 
-        public void From<T>()
+        public Query From<T>()
         {
             this.from = typeof(T);
+            return this;
         }
 
-        public void Where<T>(Expression<Func<T, bool>> fnc)
+        public Query Where<T>(Expression<Func<T, bool>> fnc)
             where T : ITable
         {
             this.where = fnc;
+            return this;
         }
 
-        public void InnerJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
+        public Query InnerJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
             where Tleft : ITable
             where Tright : ITable
         {
             this.join.Add(new Tuple<Joins, LambdaExpression>(Joins.InnerJoin, fnc));
+            return this;
         }
 
-        public void LeftOuterJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
+        public Query LeftOuterJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
             where Tleft : ITable
             where Tright : ITable
         {
             this.join.Add(new Tuple<Joins, LambdaExpression>(Joins.LeftOuterJoin, fnc));
+            return this;
         }
 
-        public void RightOuterJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
+        public Query RightOuterJoin<Tleft, Tright>(Expression<Func<Tleft, Tright, bool>> fnc)
             where Tleft : ITable
             where Tright : ITable
         {
             this.join.Add(new Tuple<Joins, LambdaExpression>(Joins.RightOuterJoin, fnc));
+            return this;
         }
 
         public override string ToString()

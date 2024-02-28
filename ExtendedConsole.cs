@@ -71,8 +71,8 @@ namespace UT.Data
         #region Private Methods
         private static ConsoleColor[] Colors()
         {
-            return new ConsoleColor[]
-            {
+            return
+            [
                 ConsoleColor.Black, 
                 ConsoleColor.Blue, 
                 ConsoleColor.Cyan, 
@@ -89,7 +89,7 @@ namespace UT.Data
                 ConsoleColor.Red, 
                 ConsoleColor.White, 
                 ConsoleColor.Yellow
-            };
+            ];
         }
         #endregion //Private Methods
     }

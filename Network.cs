@@ -9,7 +9,7 @@ namespace UT.Data
         #region Public Methods
         public static IPAddress[] LocalIPv4(NetworkInterfaceType nit)
         {
-            List<IPAddress> buffer = new();
+            List<IPAddress> buffer = [];
             foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (item.NetworkInterfaceType == nit && item.OperationalStatus == OperationalStatus.Up)
@@ -23,7 +23,7 @@ namespace UT.Data
                     }
                 }
             }
-            return buffer.ToArray();
+            return [.. buffer];
         }
         #endregion //Public Methods
     }

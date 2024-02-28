@@ -1,18 +1,27 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using UT.Data.Attributes;
+using UT.Data.Extensions;
 
 namespace UT.Data.DBE
 {
     public class Mysql : IQueryable
     {
         #region Implementations
-        string IQueryable.Compose(Query query)
+        public object[]? Execute(Query query)
+        {
+            string q = this.Compose(query);
+
+            return null;
+        }
+
+        public string Compose(Query query)
         {
             List<string> queryBuffer = new();
             if(query.ISelect.Count() != 0)
             {
                 queryBuffer.Add("select");
-                List<string> select = new();
+                List<string> select = [];
                 foreach(LambdaExpression expression in query.ISelect)
                 {
                     select.Add(this.Parse(expression));
@@ -41,7 +50,7 @@ namespace UT.Data.DBE
         #endregion //Implementations
 
         #region Private Methods
-        private string Parse(Expression expression)
+        private string Parse(Expression expression, string? param = null)
         {
             switch(expression.NodeType)
             {
@@ -54,24 +63,85 @@ namespace UT.Data.DBE
                 case ExpressionType.MemberAccess:
                     if(expression is MemberExpression member)
                     {
-                        string table = member.Expression?.Type.Name ?? string.Empty;
-                        string field = member.Member.Name;
+                        ExpressionType? type = member.Expression?.NodeType;
+                        if(type == null)
+                        {
+                            break;
+                        }
+                        switch(type)
+                        {
+                            case ExpressionType.Parameter:
+                                string table = member.Expression?.Type.Name ?? string.Empty;
+                                DescriptionAttribute? description = member.Expression?.Type.GetCustomAttribute<DescriptionAttribute>();
+                                if(description != null)
+                                {
+                                    table = description.Text;
+                                }
 
-                        return "`" + table + "`.`" + field + "`";
+                                string field = member.Member.Name;
+                                if(field.StartsWith("Field_"))
+                                {
+                                    field = field.Substring(6);
+                                }
+                                else if(field.StartsWith("Object_"))
+                                {
+                                    field = field.Substring(7) + "Id";
+                                }
+
+                                return "`" + table + "`.`" + field + "`";
+                            case ExpressionType.Constant:
+                                if(member.Expression == null)
+                                {
+                                    return "";
+                                }
+                                return "'" + this.Parse(member.Expression, member.Member.Name) + "'";
+                            default:
+                                throw new NotImplementedException(type.ToString());
+                        }
                     }
                     break;
                 case ExpressionType.Equal:
-                    if(expression is BinaryExpression binary)
+                    if(expression is BinaryExpression binaryEqual)
                     {
-                        string left = this.Parse(binary.Left);
-                        string right = this.Parse(binary.Right);
+                        string left = this.Parse(binaryEqual.Left);
+                        string right = this.Parse(binaryEqual.Right);
                         return left + " = " + right;
                     }
                     break;
                 case ExpressionType.Constant:
                     if(expression is ConstantExpression constant)
                     {
-                        return constant.ToString();
+                        if (constant.Type == typeof(string) || constant.Type == typeof(int))
+                        {
+                            return constant.ToString();
+                        }
+                        else
+                        {
+                            object? obj = constant.Value;
+                            if(obj == null || param == null)
+                            {
+                                return "";
+                            }
+                            Type type = obj.GetType();
+                            object? value = type.GetRuntimeField(param)?.GetValue(obj);
+                            if(value == null)
+                            {
+                                return "";
+                            }
+
+                            ITable? table = value as ITable;
+                            if(table != null)
+                            {
+                                ITable<int>? iInt = table as ITable<int>;
+                                if(iInt != null)
+                                {
+                                    int? primary = iInt.GetPrimary();
+                                    return primary == null ? "NULL" : primary.ToString();
+                                }
+                            }
+
+                            return value.ToString();
+                        }
                     }
                     break;
                 case ExpressionType.Parameter:
@@ -79,6 +149,15 @@ namespace UT.Data.DBE
                     {
                         return "`" + parameter.Type.Name + "`";
                     }
+                    break;
+                case ExpressionType.AndAlso:
+                    if (expression is BinaryExpression binaryAndAlso)
+                    {
+                        string left = this.Parse(binaryAndAlso.Left);
+                        string right = this.Parse(binaryAndAlso.Right);
+                        return "("+left + " and " + right+")";
+                    }
+
                     break;
                 default:
                     throw new NotImplementedException(expression.NodeType.ToString());

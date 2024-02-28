@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using UT.Data.IO;
 using System.Text;
 using UT.Data.Encryption;
+using UT.Data.IO;
 
 namespace UT.Data.Modlet
 {
@@ -63,7 +63,7 @@ namespace UT.Data.Modlet
             Dataset? dsIn = Serializer<Dataset>.Deserialize(data);
             if (dsIn == null || this.keys == null || ep == null || this.modules == null)
             {
-                return Array.Empty<byte>();
+                return [];
             }
             string lockKey = ep.ToString()?.Split(':')[0] ?? string.Empty;
 
@@ -71,12 +71,12 @@ namespace UT.Data.Modlet
             switch (dsIn.Command)
             {
                 case ModletCommands.Commands.Connect:
-                    dsOut = new Dataset(ModletCommands.Commands.Response, Array.Empty<byte>(), null);
+                    dsOut = new Dataset(ModletCommands.Commands.Response, [], null);
                     break;
                 case ModletCommands.Commands.Serverkey:
                     if (dsIn.Data == null)
                     {
-                        return Array.Empty<byte>();
+                        return [];
                     }
 
                     string computer = ASCIIEncoding.UTF8.GetString(dsIn.Data);
@@ -138,7 +138,7 @@ namespace UT.Data.Modlet
 
             if(dsOut == null)
             {
-                return Array.Empty<byte>();
+                return [];
             }
             return Serializer<Dataset>.Serialize(dsOut);
         }
