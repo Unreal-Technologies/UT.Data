@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using UT.Data.Encryption;
 using UT.Data.Extensions;
 
 namespace UT.Data.IO
@@ -8,6 +9,10 @@ namespace UT.Data.IO
         #region Members
         private FileInfo location;
         #endregion //Members
+
+        #region Constants
+        private const string Key = "0x4571A4D8";
+        #endregion //Constants
 
         #region Constructors
         public LocalConfig(string name)
@@ -39,7 +44,7 @@ namespace UT.Data.IO
         public bool Save<T>(T obj)
             where T : class
         {
-            byte[] stream = Serializer<T>.Serialize(obj);
+            byte[] stream = Aes.Encrypt(Serializer<T>.Serialize(obj), LocalConfig.Key);
 
             try
             {
@@ -66,7 +71,7 @@ namespace UT.Data.IO
             byte[] stream = fs.Read();
             fs.Close();
 
-            return Serializer<T>.Deserialize(stream);
+            return Serializer<T>.Deserialize(Aes.Decrypt(stream, LocalConfig.Key) ?? []);
         }
         #endregion //Public Methods
     }

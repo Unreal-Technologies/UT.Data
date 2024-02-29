@@ -1,22 +1,57 @@
 ﻿using System.Text.RegularExpressions;
+using UT.Data.Extensions;
 
 namespace UT.Data
 {
-    public class ExtendedConsole
+    public partial class ExtendedConsole
     {
+        #region Statics
+        private static bool boxingMode;
+        private static int boxingSize;
+        #endregion //Statics
+
         #region Public Methods
+        public static void BoxMode(bool enabled, int? length=null)
+        {
+            ExtendedConsole.boxingMode = enabled;
+            if(length == null)
+            {
+                length = 64;
+            }
+            if(enabled)
+            {
+                ExtendedConsole.boxingSize = length.Value;
+            }
+
+            int size = ExtendedConsole.boxingSize;
+
+            Console.WriteLine("* " + ("-").Repeat(size) + " *");
+
+            if (!enabled)
+            {
+                Console.WriteLine();
+            }
+        }
+
         public static void WriteLine(string text)
         {
             ConsoleColor baseColor = Console.ForegroundColor;
+            if(ExtendedConsole.boxingMode)
+            {
+                int len = EndTagMatchRegex().Replace(StartTagMatchRegex().Replace(text, ""), "").Length;
+                int padding = ExtendedConsole.boxingSize - len;
 
-            List<ConsoleColor> colors = new();
-            foreach(Match match in Regex.Matches(text, @"\<[a-z]+\>", RegexOptions.IgnoreCase))
+                text = "| " + text + (" ".Repeat(padding)) + " |";
+            }
+
+            List<ConsoleColor> colors = [];
+            foreach(Match match in StartTagMatchRegex().Matches(text).Cast<Match>())
             {
                 string txtMatch = match.Value;
                 string txtColor = txtMatch[1..(txtMatch.Length - 1)];
                 foreach(ConsoleColor color in ExtendedConsole.Colors())
                 {
-                    if(color.ToString().ToLower() == txtColor.ToLower())
+                    if(color.ToString().Equals(txtColor, StringComparison.CurrentCultureIgnoreCase))
                     {
                         colors.Add(color);
                     }
@@ -25,7 +60,7 @@ namespace UT.Data
 
             string txtBuffer = text;
             string lcBuffer = txtBuffer.ToLower();
-            List<Tuple<string, ConsoleColor>> buffer = new();
+            List<Tuple<string, ConsoleColor>> buffer = [];
             foreach(ConsoleColor color in colors)
             {
                 string sTag = ("<" + color + ">").ToLower();
@@ -91,6 +126,12 @@ namespace UT.Data
                 ConsoleColor.Yellow
             ];
         }
+
+        [GeneratedRegex(@"\<[a-z]+\>", RegexOptions.IgnoreCase)]
+        private static partial Regex StartTagMatchRegex();
+
+        [GeneratedRegex(@"\<\/[a-z]+\>", RegexOptions.IgnoreCase)]
+        private static partial Regex EndTagMatchRegex();
         #endregion //Private Methods
     }
 }
