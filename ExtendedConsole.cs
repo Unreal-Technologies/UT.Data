@@ -123,7 +123,7 @@ namespace UT.Data
                 ConsoleColor.Magenta, 
                 ConsoleColor.Red, 
                 ConsoleColor.White, 
-                ConsoleColor.Yellow
+                ConsoleColor.Yellow,
             ];
         }
 

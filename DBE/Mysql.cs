@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using MySql.Data.MySqlClient;
+using System.Linq.Expressions;
 using System.Net;
 using System.Reflection;
 using UT.Data.Attributes;
@@ -11,15 +12,44 @@ namespace UT.Data.DBE
     [Default("Password", "")]
     public class Mysql : IQueryable, IDatabaseConnection
     {
+        #region Members
+        private MySqlConnection? conn;
+        #endregion //Members
+
+        #region Events
+        public event IDatabaseConnection.OnExceptionHandler? OnException;
+        #endregion //Events
+
         #region Implementations
-        public bool Connect(IPAddress ip, int port, string database, string username, string password)
+        public bool Open(IPAddress ip, int port, string database, string username, string password)
         {
-            return true;
+            string connectionString = "SERVER=" + ip.ToString() + "; PORT=" + port + ";" + "DATABASE=" + database + ";" + "UID=" + username + ";" + "PASSWORD=" + password + ";";
+            this.conn = new MySqlConnection(connectionString);
+
+            try
+            {
+                this.conn.Open();
+                return true;
+            }
+            catch(MySqlException mex)
+            {
+                this.OnException?.Invoke(mex);
+                return false;
+            }
         }
 
         public bool Close()
         {
-            return false;
+            try
+            {
+                this.conn?.Close();
+                return true;
+            }
+            catch(MySqlException mex)
+            {
+                this.OnException?.Invoke(mex);
+                return false;
+            }
         }
 
         public object[]? Execute(Query query)
@@ -32,7 +62,7 @@ namespace UT.Data.DBE
         public string Compose(Query query)
         {
             List<string> queryBuffer = [];
-            if(query.ISelect.Count() != 0)
+            if(query.ISelect.Length != 0)
             {
                 queryBuffer.Add("select");
                 List<string> select = [];
@@ -46,7 +76,7 @@ namespace UT.Data.DBE
             {
                 queryBuffer.Add("from `" + query.IFrom.Name + "`");
             }
-            if(query.IInnerJoin.Count() != 0)
+            if(query.IInnerJoin.Length != 0)
             {
                 foreach (Tuple<Query.Joins, LambdaExpression> tuple in query.IInnerJoin)
                 {
@@ -95,11 +125,11 @@ namespace UT.Data.DBE
                                 string field = member.Member.Name;
                                 if(field.StartsWith("Field_"))
                                 {
-                                    field = field.Substring(6);
+                                    field = field[6..];
                                 }
                                 else if(field.StartsWith("Object_"))
                                 {
-                                    field = field.Substring(7) + "Id";
+                                    field = string.Concat(field.AsSpan(7), "Id");
                                 }
 
                                 return "`" + table + "`.`" + field + "`";
@@ -143,18 +173,16 @@ namespace UT.Data.DBE
                                 return "";
                             }
 
-                            ITable? table = value as ITable;
-                            if(table != null)
+                            if (value is ITable table)
                             {
-                                ITable<int>? iInt = table as ITable<int>;
-                                if(iInt != null)
+                                if (table is ITable<int> iInt)
                                 {
                                     int? primary = iInt.GetPrimary();
-                                    return primary == null ? "NULL" : primary.ToString();
+                                    return primary == null ? "NULL" : primary.ToString() ?? "NULL";
                                 }
                             }
 
-                            return value.ToString();
+                            return value.ToString() ?? "NULL";
                         }
                     }
                     break;

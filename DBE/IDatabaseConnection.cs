@@ -4,9 +4,19 @@ namespace UT.Data.DBE
 {
     public interface IDatabaseConnection
     {
+        #region Public Methods
         public object[]? Execute(Query query);
         public string Compose(Query query);
-        public bool Connect(IPAddress ip, int port, string database, string username, string password);
+        public bool Open(IPAddress ip, int port, string database, string username, string password);
         public bool Close();
+        #endregion //Public Methods
+
+        #region Delegates
+        public delegate void OnExceptionHandler(Exception mex);
+        #endregion //Delegates
+
+        #region Events
+        public event OnExceptionHandler? OnException;
+        #endregion //Events
     }
 }
