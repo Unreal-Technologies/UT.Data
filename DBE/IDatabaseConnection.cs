@@ -9,6 +9,7 @@ namespace UT.Data.DBE
         public string Compose(Query query);
         public bool Open(IPAddress ip, int port, string database, string username, string password);
         public bool Close();
+        public void CreateOrUpdateTable(ITable table);
         #endregion //Public Methods
 
         #region Delegates

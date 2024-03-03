@@ -4,5 +4,8 @@
     {
         public string Compose(Query query);
         public object[]? Execute(Query query);
+        public bool StartTransaction();
+        public bool CommitTransaction();
+        public bool RevertTransaction();
     }
 }

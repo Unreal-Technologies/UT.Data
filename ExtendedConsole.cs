@@ -14,10 +14,7 @@ namespace UT.Data
         public static void BoxMode(bool enabled, int? length=null)
         {
             ExtendedConsole.boxingMode = enabled;
-            if(length == null)
-            {
-                length = 64;
-            }
+            length ??= 64;
             if(enabled)
             {
                 ExtendedConsole.boxingSize = length.Value;

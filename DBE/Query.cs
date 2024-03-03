@@ -3,7 +3,7 @@ using UT.Data.Attributes;
 
 namespace UT.Data.DBE
 {
-    public class Query
+    public class Query(IDatabaseConnection queryable)
     {
         #region Enums
         public enum Joins
@@ -18,9 +18,9 @@ namespace UT.Data.DBE
         #endregion //Enums
 
         #region Members
-        private readonly IDatabaseConnection queryable;
-        private readonly List<LambdaExpression> select;
-        private readonly List<Tuple<Joins, LambdaExpression>> join;
+        private readonly IDatabaseConnection queryable = queryable;
+        private readonly List<LambdaExpression> select = [];
+        private readonly List<Tuple<Joins, LambdaExpression>> join = [];
         private Type? from;
         private LambdaExpression? where;
         #endregion //Members
@@ -28,12 +28,12 @@ namespace UT.Data.DBE
         #region Properties
         internal Tuple<Joins, LambdaExpression>[] IInnerJoin
         {
-            get { return this.join.ToArray(); }
+            get { return [.. this.join]; }
         }
 
         internal LambdaExpression[] ISelect
         {
-            get { return this.select.ToArray(); }
+            get { return [.. this.select]; }
         }
 
         internal Type? IFrom
@@ -45,16 +45,8 @@ namespace UT.Data.DBE
         {
             get { return this.where; }
         }
-        #endregion //Properties
 
-        #region Constructors
-        public Query(IDatabaseConnection queryable)
-        {
-            this.queryable = queryable;
-            this.select = [];
-            this.join = [];
-        }
-        #endregion //Constructors
+        #endregion //Properties
 
         #region Public Methods
         public object[]? Execute()
