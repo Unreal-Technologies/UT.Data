@@ -11,7 +11,7 @@ namespace UT.Data.DBE
         public int? Field_Id { get { return this.id; } }
         public string? Field_Table { get { return this.table; } set { this.table = value; this.Changed.Add("table"); } }
         public string? Field_Hash { get { return this.hash; } set { this.hash = value; this.Changed.Add("hash"); } }
-        public DateTime Field_TransStartDate { get { return this.transStartDate; } }
+        public DateTime? Field_TransStartDate { get { return this.transStartDate; } }
         
         #endregion //Properties
 
@@ -23,7 +23,7 @@ namespace UT.Data.DBE
         [Length(32)]
         private string? hash;
         [Default("now()")]
-        private DateTime transStartDate;
+        private DateTime? transStartDate;
         #endregion //Members
     }
 }

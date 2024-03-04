@@ -45,8 +45,8 @@ namespace UT.Data.DBE
             }
         }
 
-        public bool Save<T>(ITable<T> table, bool refresh = false)
-            where T : struct
+        public bool Save<T>(ref Table<T, int> table, bool refresh = false) 
+            where T : class
         {
             Dictionary<string, string> values = [];
             foreach (FieldInfo fi in table.GetType().GetRuntimeFields())
@@ -54,14 +54,14 @@ namespace UT.Data.DBE
                 PrimaryKeyAttribute? pka = fi.GetCustomAttribute<PrimaryKeyAttribute>();
                 if (pka == null && table.Changed.Contains(fi.Name))
                 {
-                    values.Add(fi.Name, GetMysqlValue(fi.GetValue(table)));
+                    values.Add(fi.Name, GetMysqlValue(fi.GetValue(table), fi));
                 }
             }
 
             DescriptionAttribute? description = table.GetAttribute<DescriptionAttribute>();
             string tableName = description != null ? description.Text : table.GetType().Name;
 
-            T? primary = table.GetPrimary();
+            int? primary = table.GetPrimary();
             if (primary == null)
             {
                 List<string> ks = [];
@@ -76,6 +76,8 @@ namespace UT.Data.DBE
                 Resultset rs = this.Execute(composed);
                 if(refresh && rs.IsSuccess)
                 {
+                    int lastInsertId = Convert.ToInt32(rs.LastInsertId);
+
                     throw new NotImplementedException("SAVE - REFRESH");
                 }
 
@@ -228,7 +230,8 @@ namespace UT.Data.DBE
                     Field_Hash = hash,
                     Field_Table = tableName
                 };
-                if (!this.Save(ti))
+
+                if (!this.Save<TableInfo>(ref ti, false))
                 {
                     this.RevertTransaction();
                     return false;
@@ -239,7 +242,7 @@ namespace UT.Data.DBE
             return false;
         }
 
-        private static string GetMysqlValue(object? value)
+        private static string GetMysqlValue(object? value, FieldInfo fi)
         {
             if(value == null)
             {
@@ -259,6 +262,12 @@ namespace UT.Data.DBE
                 if(dt == null || dt == DateTime.MinValue)
                 {
                     return "NULL";
+                }
+
+                DateAttribute? dateAttribute = fi.GetCustomAttribute<DateAttribute>();
+                if (dateAttribute != null)
+                {
+                    return "'" + dt.Value.ToString("yyyy-MM-dd") + "'";
                 }
 
                 return "'" + dt.Value.ToString("yyyy-MM-dd HH:mm:ss") + "'";
@@ -302,6 +311,12 @@ namespace UT.Data.DBE
             }
             else if(t == typeof(DateTime))
             {
+                DateAttribute? dateAttribute = fi.GetCustomAttribute<DateAttribute>();
+                if(dateAttribute != null)
+                {
+                    return "date" + partialComposed;
+                }
+
                 return "datetime" + partialComposed;
             }
             else
