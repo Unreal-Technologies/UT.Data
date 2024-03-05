@@ -15,8 +15,12 @@ namespace UT.Data.Encryption
             );
         }
 
-        public static string Encrypt(string text, string password)
+        public static string? Encrypt(string? text, string password)
         {
+            if(text == null)
+            {
+                return null;
+            }
             return Convert.ToBase64String(Encrypt(
                 text.AsBytes(), 
                 Key(password), 
@@ -44,7 +48,7 @@ namespace UT.Data.Encryption
             }
         }
 
-        public static string? Decrypt(string text, string password)
+        public static string? Decrypt(string? text, string password)
         {
             if(text == null)
             {
