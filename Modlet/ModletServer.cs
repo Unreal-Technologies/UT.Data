@@ -1,6 +1,6 @@
-﻿using System.Net;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Text;
-using UT.Data.DBE;
 using UT.Data.Encryption;
 using UT.Data.IO;
 
@@ -37,13 +37,13 @@ namespace UT.Data.Modlet
         #endregion //Constructors
 
         #region Public Methods
-        public bool Register(IModlet module, IDatabaseConnection? dbc, ref Dictionary<string, object?> configuration)
+        public bool Register(IModlet module, DbContext? context, ref Dictionary<string, object?> configuration)
         {
             if(this.modules == null)
             {
                 return false;
             }
-            module.OnServerConfiguration(dbc, ref configuration);
+            module.OnServerConfiguration(context, ref configuration);
             this.modules.Add(module);
             return true;
         }

@@ -1,4 +1,4 @@
-﻿using UT.Data.DBE;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace UT.Data.Modlet
 {
@@ -8,7 +8,7 @@ namespace UT.Data.Modlet
         public void OnClientConfiguration(ModletClient client);
         public void OnGlobalServerAction(byte[]? stream);
         public byte[]? OnLocalServerAction(byte[]? stream);
-        public void OnServerConfiguration(IDatabaseConnection? dbc, ref Dictionary<string, object?> configuration);
-        public void OnServerInstallation(IDatabaseConnection? dbc);
+        public void OnServerConfiguration(DbContext? context, ref Dictionary<string, object?> configuration);
+        public void OnServerInstallation(DbContext? context);
     }
 }
