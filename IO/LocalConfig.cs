@@ -18,12 +18,7 @@ namespace UT.Data.IO
         public LocalConfig(string name)
         {
             Assembly assem = Assembly.GetCallingAssembly();
-            string? codeBase = assem.GetName().CodeBase;
-            if(codeBase == null)
-            {
-                throw new NotImplementedException("No Codebase");
-            }
-            DirectoryInfo? dir = (new FileInfo(codeBase.Replace("file:///", ""))).Directory;
+            DirectoryInfo? dir = (new FileInfo(assem.Location)).Directory;
             if(dir == null)
             {
                 throw new NotImplementedException("No Codebase");

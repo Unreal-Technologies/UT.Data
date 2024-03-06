@@ -70,67 +70,28 @@ namespace UT.Data.Encryption
 
         public static byte[] Decrypt(byte[] text, byte[] key, byte[] iv)
         {
-            RijndaelManaged aes = new RijndaelManaged
-            {
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7,
-                KeySize = 256,
-                BlockSize = 128,
-                Key = Aes.FixKeyLength(key, 32),
-                IV = iv
-            };
+            var aes = System.Security.Cryptography.Aes.Create();
+            aes.IV = iv;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Mode = CipherMode.CBC;
+            aes.KeySize = 256;
+            aes.BlockSize = 128;
+            aes.Key = Aes.FixKeyLength(key, 32);
 
-            MemoryStream value = new();
-            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-            using (MemoryStream ms = new(text))
-            {
-                using (CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read))
-                {
-                    byte[] buffer = new byte[1024];
-                    int k = 0;
-                    while ((k = cs.Read(buffer, 0, buffer.Length)) != 0)
-                    {
-                        value.Write(buffer, 0, k);
-                        if(k < buffer.Length)
-                        {
-                            continue;
-                        }
-                    }
-
-                    cs.Close();
-                }
-                ms.Close();
-            }
-
-            byte[] data = new byte[value.Length];
-            value.Position = 0;
-            value.Read(data, 0, data.Length);
-            return data;
+            return aes.DecryptCbc(text, iv, PaddingMode.PKCS7);
         }
 
         public static byte[] Encrypt(byte[] text, byte[] key, byte[] iv)
         {
-            RijndaelManaged aes = new RijndaelManaged
-            {
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7,
-                KeySize = 256,
-                BlockSize = 128,
-                Key = Aes.FixKeyLength(key, 32),
-                IV = iv
-            };
+            var aes = System.Security.Cryptography.Aes.Create();
+            aes.IV = iv;
+            aes.Padding = PaddingMode.Zeros;
+            aes.Mode = CipherMode.CBC;
+            aes.KeySize = 256;
+            aes.BlockSize = 128;
+            aes.Key = Aes.FixKeyLength(key, 32);
 
-            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-            MemoryStream ms = new();
-            using (CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write))
-            {
-                cs.Write(text, 0, text.Length);
-                cs.Close();
-            }
-            byte[] encoded = ms.ToArray();
-            ms.Close();
-
-            return encoded;
+            return aes.EncryptCbc(text, iv, PaddingMode.PKCS7);
         }
         #endregion //Public Methods
 

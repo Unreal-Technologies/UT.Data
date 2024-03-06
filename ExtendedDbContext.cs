@@ -4,9 +4,16 @@ using UT.Data.Attributes;
 
 namespace UT.Data
 {
-    [Default("Password", ""), Default("Username", "root"), Default("Port", "3306"), Default("Server", "127.0.0.1")]
+    [Default("Password", Password), Default("Username", Username), Default("Port", Port), Default("Server", Server)]
     public abstract class ExtendedDbContext : DbContext
     {
+        #region Constants
+        public const string Username = "root";
+        public const string Password = "";
+        public const int Port = 3306;
+        public const string Server = "127.0.0.1";
+        #endregion //Constants
+
         #region Enums
         public enum Types
         {
@@ -20,7 +27,7 @@ namespace UT.Data
         #endregion //Enums
 
         #region Members
-        private Dictionary<Parameters, object> config;
+        private readonly Dictionary<Parameters, object> config;
         #endregion //Members
 
         #region Constructors
@@ -36,9 +43,9 @@ namespace UT.Data
         }
         #endregion //Constructors
 
+        #region Overrides
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //base.OnConfiguring(optionsBuilder);
             Types type = (Types)this.config[Parameters.Type];
             int port = (int)this.config[Parameters.Port];
             string username = (string)this.config[Parameters.Username];
@@ -53,5 +60,6 @@ namespace UT.Data
                     break;
             }
         }
+        #endregion //Overrides
     }
 }
