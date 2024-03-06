@@ -77,7 +77,7 @@ namespace UT.Data.IO
 
         private static IPAddress[] Parse(string[] ip)
         {
-            List<IPAddress> list = new();
+            List<IPAddress> list = [];
             foreach (string v in ip)
             {
                 if (IPAddress.TryParse(v, out IPAddress? parsed))
@@ -106,13 +106,20 @@ namespace UT.Data.IO
 
             while (this._isActive)
             {
-                while (!this._running) { Thread.Sleep(1); }
-                while (this._running)
+                while (!this._running && this._isActive) { Thread.Sleep(1); }
+                while (this._running && this._isActive)
                 {
-                    Socket s = listener.AcceptSocket();
-                    Thread t = new(new ParameterizedThreadStart(this.SocketThread));
-                    t.Start(s);
-                    Thread.Sleep(25);
+                    while(!listener.Pending() && this._isActive)
+                    {
+                        Thread.Sleep(1);
+                    }
+                    if (this._isActive)
+                    {
+                        Socket s = listener.AcceptSocket();
+                        Thread t = new(new ParameterizedThreadStart(this.SocketThread));
+                        t.Start(s);
+                        Thread.Sleep(1);
+                    }
                 }
             }
             listener.Stop();

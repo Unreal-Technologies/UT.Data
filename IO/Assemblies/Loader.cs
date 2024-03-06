@@ -53,8 +53,7 @@ namespace UT.Data.IO.Assemblies
         public static Assembly[] GetAssemblies<T>()
             where T : class
         {
-            List<Assembly> assemblies = new();
-            assemblies.Add(Assembly.GetExecutingAssembly());
+            List<Assembly> assemblies = [Assembly.GetExecutingAssembly()];
 
             Assembly? entryAssem = Assembly.GetEntryAssembly();
             if (entryAssem != null)
@@ -87,11 +86,11 @@ namespace UT.Data.IO.Assemblies
                     continue;
                 }
 
-                Assembly assem = Assembly.LoadFile(fi.FullName);
+                Assembly assem = Assembly.LoadFrom(fi.FullName);
                 assemblies.Add(assem);
             }
 
-            return assemblies.ToArray();
+            return [.. assemblies];
         }
         #endregion //Public Methods
 
