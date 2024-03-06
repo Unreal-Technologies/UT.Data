@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using UT.Data.Extensions;
 using UT.Data.IO;
 
 namespace UT.Data.Modlet

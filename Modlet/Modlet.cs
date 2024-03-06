@@ -4,9 +4,10 @@ namespace UT.Data.Modlet
 {
     public class Modlet
     {
-        public static IModlet[] Load(SequentialExecution? se)
+        public static IModlet[] Load<T>(SequentialExecution? se)
+            where T : class, IModlet
         {
-            IModlet[] list = Loader.GetInstances<IModlet>();
+            IModlet[] list = Loader.GetInstances<IModlet>().Where(x => (x as T) != null).ToArray();
             if (se != null)
             {
                 foreach (IModlet modlet in list)
@@ -14,7 +15,7 @@ namespace UT.Data.Modlet
                     modlet.OnSequentialExecutionConfiguration(se);
                 }
             }
-            return list.ToArray();
+            return [.. list];
         }
     }
 }
