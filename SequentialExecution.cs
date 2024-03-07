@@ -1,12 +1,13 @@
 ﻿namespace UT.Data
 {
-    public class SequentialExecution
+    public class SequentialExecution(Form? parent)
     {
         #region Members
-        private readonly List<Tuple<Task, string>> tasks;
-        private int position;
-        private bool isValid;
-        private readonly Form? parent;
+        private readonly List<Tuple<Task, string>> tasks = [];
+        private int position = 0;
+        private bool isValid = true;
+        private readonly Form? parent = parent;
+        private bool active = true;
         #endregion //Members
 
         #region Delegates
@@ -29,19 +30,17 @@
 
         #region Events
         public event OnOutput? Output;
-        #endregion //Events
 
+        #endregion //Events
         #region Constructors
-        public SequentialExecution(Form? parent)
-        {
-            this.tasks = new List<Tuple<Task, string>>();
-            this.position = 0;
-            this.isValid = true;
-            this.parent = parent;
-        }
         #endregion //Constructors
 
         #region Public Methods
+        public void Exit()
+        {
+            this.active = false;
+        }
+
         public void Add(Task task, string title, int? position = null)
         {
             if (position == null)
@@ -90,7 +89,7 @@
         private void SubThread()
         {
             bool state = true;
-            while(this.position < this.tasks.Count)
+            while(this.position < this.tasks.Count && this.active)
             {
                 Tuple<Task, string> data = this.tasks[this.position];
                 Task task = data.Item1;
