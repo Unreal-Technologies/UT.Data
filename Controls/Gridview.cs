@@ -1,6 +1,4 @@
-﻿using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
-
-namespace UT.Data.Controls
+﻿namespace UT.Data.Controls
 {
     public class Gridview<Tid> : Panel
         where Tid : struct
@@ -26,9 +24,9 @@ namespace UT.Data.Controls
         #endregion //Delegates
 
         #region Events
-        public ClickHandler? OnAdd;
-        public ClickHandler? OnEdit;
-        public ClickHandler? OnRemove;
+        public ClickHandler? OnAdd { get; set; }
+        public ClickHandler? OnEdit { get; set; }
+        public ClickHandler? OnRemove { get; set; }
         #endregion //Events
 
         #region Members
@@ -62,6 +60,8 @@ namespace UT.Data.Controls
                 Size = Resources.Plus.Size
             };
             this.add.Click += delegate (object? sender, EventArgs e) { this.OnAdd?.Invoke(null); };
+
+            this.SetColumns([]);
         }
         #endregion //Constructors
 
@@ -271,13 +271,20 @@ namespace UT.Data.Controls
                 {
                     Point index = new(x, y);
                     Size size = new(columns[x], rows[y]);
-                    Control? control = this.fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => x.Item2).FirstOrDefault();
-                    Alignment alignment = this.fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => x.Item3).FirstOrDefault();
+
+                    Tuple<Control?, Alignment>? data = this.fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment>(x.Item2, x.Item3)).FirstOrDefault();
+                    if(data == null)
+                    {
+                        continue;
+                    }
+
+                    Control? control = data.Item1;
+                    Alignment alignment = data.Item2;
 
                     if (control != null)
                     {
                         control.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                        control.Location = new Point(offsetX, offsetY + ((size.Height - control.Height) / 2));
+                        control.Location = new Point(offsetX, offsetY + ((size.Height - control.Height) / 2)); //Default Left Align
                         if(alignment == Alignment.Right)
                         {
                             int baseX = control.Location.X;

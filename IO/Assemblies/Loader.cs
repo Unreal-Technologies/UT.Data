@@ -45,7 +45,7 @@ namespace UT.Data.IO.Assemblies
             T[] ordinal = [.. buffer.OrderBy(x => x.GetAttribute<PositionAttribute>()?.Position ?? int.MaxValue).ThenBy(x => x.GetType().AssemblyQualifiedName)];
             if(!byRequirements)
             {
-                return ordinal;
+                return [.. ordinal.Distinct()];
             }
             return Loader.GetInstancesOrdinalByRequirements<T>(ordinal);
         }
@@ -128,7 +128,7 @@ namespace UT.Data.IO.Assemblies
 
             Loader.FillBuffer(buffer, trees, list);
 
-            return [.. buffer];
+            return [.. buffer.Distinct()];
         }
 
         private static void FillBuffer<T>(List<T> buffer, Branch<int>[] branches, T[] list)

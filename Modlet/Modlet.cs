@@ -15,7 +15,7 @@ namespace UT.Data.Modlet
                     modlet.OnSequentialExecutionConfiguration(se);
                 }
             }
-            return [.. list];
+            return [.. list.Distinct()];
         }
     }
 }
