@@ -61,19 +61,9 @@ namespace UT.Data.IO.Assemblies
                 assemblies.Add(entryAssem);
             }
 
-            Assembly? selfAssem = Assembly.GetAssembly(typeof(T));
-            if (selfAssem == null)
-            {
-                throw new NotImplementedException();
-            }
-
+            Assembly? selfAssem = Assembly.GetAssembly(typeof(T)) ?? throw new NotImplementedException();
             FileInfo file = new(selfAssem.Location);
-            DirectoryInfo? root = file.Directory;
-            if (root == null)
-            {
-                throw new NotImplementedException();
-            }
-
+            DirectoryInfo? root = file.Directory ?? throw new NotImplementedException();
             foreach (FileInfo fi in root.EnumerateFiles("*.dll"))
             {
                 if (fi.FullName == file.FullName)
@@ -155,9 +145,9 @@ namespace UT.Data.IO.Assemblies
         {
             if(list == null)
             {
-                return Array.Empty<Type>();
+                return [];
             }
-            List<Type> buffer = new();
+            List<Type> buffer = [];
             foreach(Type t in list)
             {
                 if(t.GetInterfaces().Where(x => x == typeof(T)).FirstOrDefault() != null)
@@ -166,7 +156,7 @@ namespace UT.Data.IO.Assemblies
                 }
             }
 
-            return buffer.ToArray();
+            return [.. buffer];
         }
         #endregion //Private Methods
     }

@@ -109,11 +109,13 @@
                     edit.Click += delegate (object? sender, EventArgs e) { this.OnEdit?.Invoke(row.ID); };
                     edit.Image = Resources.Pencil;
                     edit.Size = Resources.Pencil.Size;
+                    edit.Enabled = row.Edit == null || row.Edit == true;
 
                     Button remove = new();
                     remove.Click += delegate (object? sender, EventArgs e) { this.OnRemove?.Invoke(row.ID); };
                     remove.Image = Resources.Delete;
                     remove.Size = Resources.Delete.Size;
+                    remove.Enabled = row.Remove == null || row.Remove == true;
 
                     this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, r + i), edit, Alignment.Left));
                     this.Controls.Add(edit);
@@ -191,7 +193,7 @@
                     Text = column.Text,
                     Font = new Font(this.Font, FontStyle.Bold)
                 };
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, 0), l, Alignment.Left));
+                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, 0), l, Alignment.Center));
                 this.Controls.Add(l);
 
                 i++;
@@ -302,6 +304,7 @@
                 }
                 offsetY += rows.Values.Max() + padding;
             }
+            this.Size = this.PreferredSize;
         }
 
         private void DrawHorizontalLines(Graphics g)
@@ -353,6 +356,8 @@
             #region Properties
             public List<Cell> Cells { get; set; }
             public Tid? ID { get; set; }
+            public bool? Remove { get; set; }
+            public bool? Edit { get; set; }
             #endregion //Properties
 
             #region Constructors
