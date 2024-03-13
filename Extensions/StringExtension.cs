@@ -8,10 +8,18 @@ namespace UT.Data.Extensions
     public static class StringExtension
     {
         #region Public Methods
+        public static string UcFirst(this string value)
+        {
+            string left = value[..1];
+            string right = value[1..];
+
+            return left.ToUpper() + right;
+        }
+
         public static string Repeat(this string value, int times)
         {
             string sOut = "";
-            for(int i=0;i<times; i++)
+            for (int i = 0; i < times; i++)
             {
                 sOut += value;
             }
@@ -21,7 +29,7 @@ namespace UT.Data.Extensions
 
         public static bool AsBoolean(this string value)
         {
-            return value.ToLower() == "true";
+            return value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
         }
 
         public static byte[] AsBytes(this string value)
@@ -31,9 +39,8 @@ namespace UT.Data.Extensions
 
         public static string Md5(this string value, bool lowercase = true)
         {
-            MD5 md5 = MD5.Create();
             byte[] input = value.AsBytes();
-            byte[] hash = md5.ComputeHash(input);
+            byte[] hash = MD5.HashData(input);
             StringBuilder sb = new();
             foreach (byte b in hash)
             {
@@ -53,7 +60,7 @@ namespace UT.Data.Extensions
             foreach(MemberInfo mi in typeof(T).GetMembers())
             {
                 bool found = false;
-                if(mi.Name.ToLower() == value.ToLower())
+                if(mi.Name.Equals(value, StringComparison.CurrentCultureIgnoreCase))
                 {
                     found = true;
                 }
@@ -61,7 +68,7 @@ namespace UT.Data.Extensions
                 if (!found)
                 {
                     DescriptionAttribute? da = mi.GetCustomAttribute<DescriptionAttribute>();
-                    if (da != null && da.Text.ToLower() == value.ToLower())
+                    if (da != null && da.Text.Equals(value, StringComparison.CurrentCultureIgnoreCase))
                     {
                         found = true;
                     }
@@ -73,7 +80,7 @@ namespace UT.Data.Extensions
                     {
                         continue;
                     }
-                    return (T)values.First(x => x.ToString().ToLower() == mi.Name.ToLower());
+                    return (T)values.First(x => x.ToString().Equals(mi.Name, StringComparison.CurrentCultureIgnoreCase));
                 }
             }
 
