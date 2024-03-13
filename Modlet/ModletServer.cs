@@ -14,6 +14,10 @@ namespace UT.Data.Modlet
         private int semiRand;
         #endregion //Members
 
+        #region Properties
+        public IModlet[] Modules { get { return [.. this.modules]; } }
+        #endregion //Properties
+
         #region Constructors
         public ModletServer(string[] ip, int port) : base(ip, port)
         {
