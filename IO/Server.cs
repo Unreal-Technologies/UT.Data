@@ -22,7 +22,7 @@ namespace UT.Data.IO
 
         public Server(string[] ip, int[] ports) : this(Server.Parse(ip), ports) { }
 
-        public Server(IPAddress[] ip, int port) : this(ip, new[] { port }) { }
+        public Server(IPAddress[] ip, int port) : this(ip, [port]) { }
 
         public Server(IPAddress[] ip, int[] ports)
         {
@@ -86,7 +86,7 @@ namespace UT.Data.IO
                 }
             }
 
-            return list.ToArray();
+            return [.. list];
         }
 
         private void InitializerThread(object? data)

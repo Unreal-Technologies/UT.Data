@@ -19,7 +19,7 @@ namespace UT.Data.IO.Assemblies
             {
                 foreach (Type type in assembly.GetExportedTypes())
                 {
-                    if (!type.IsInterface && isInterface)
+                    if (!type.IsInterface && !type.IsAbstract && isInterface)
                     {
                         Type? modlet = type.GetInterfaces().Where(x => x == typeof(T)).FirstOrDefault();
                         if (modlet != null)
@@ -31,7 +31,7 @@ namespace UT.Data.IO.Assemblies
                             }
                         }
                     }
-                    else if(!type.IsInterface && type == typeof(T))
+                    else if(!type.IsInterface && !type.IsAbstract && type == typeof(T))
                     {
                         T? instance = (T?)Activator.CreateInstance(type);
                         if (instance != null)

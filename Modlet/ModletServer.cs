@@ -84,9 +84,9 @@ namespace UT.Data.Modlet
                     string computer = ASCIIEncoding.UTF8.GetString(dsIn.Data);
                     string key;
 
-                    if (this.keys.ContainsKey(lockKey))
+                    if (keys.TryGetValue(lockKey, out string? value))
                     {
-                        key = this.keys[lockKey];
+                        key = value;
                     }
                     else
                     {
