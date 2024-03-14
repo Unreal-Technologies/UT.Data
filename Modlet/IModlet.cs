@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace UT.Data.Modlet
 {
@@ -6,8 +7,8 @@ namespace UT.Data.Modlet
     {
         public void OnSequentialExecutionConfiguration(SequentialExecution se);
         public void OnClientConfiguration(Form? form);
-        public void OnGlobalServerAction(byte[]? stream);
-        public byte[]? OnLocalServerAction(byte[]? stream);
+        public void OnGlobalServerAction(byte[]? stream, IPAddress ip);
+        public byte[]? OnLocalServerAction(byte[]? stream, IPAddress ip);
         public void OnServerConfiguration(DbContext? context, ref Dictionary<string, object?> configuration);
         public void OnServerInstallation(DbContext? context);
     }

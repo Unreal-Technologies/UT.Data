@@ -104,6 +104,12 @@ namespace UT.Data.Modlet
                 case ModletCommands.Commands.Action:
                     byte[]? module = dsIn.Module;
                     byte[]? stream = dsIn.Data;
+                    IPAddress? ip = (ep as IPEndPoint)?.Address;
+                    if(ip == null)
+                    {
+                        return [];
+                    }
+
                     string aeskey = this.keys[lockKey];
                     if(stream != null)
                     {
@@ -120,7 +126,7 @@ namespace UT.Data.Modlet
                     {
                         foreach(IModlet m in this.modules)
                         {
-                            m.OnGlobalServerAction(stream);
+                            m.OnGlobalServerAction(stream, ip);
                         }
                     }
                     else
@@ -128,7 +134,7 @@ namespace UT.Data.Modlet
                         IModlet? m = this.modules.Where(x => x.GetType().AssemblyQualifiedName == type.AssemblyQualifiedName).FirstOrDefault();
                         if(m != null)
                         {
-                            output = m.OnLocalServerAction(stream);
+                            output = m.OnLocalServerAction(stream, ip);
                         }
                     }
 
