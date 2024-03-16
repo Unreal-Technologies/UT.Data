@@ -7,8 +7,7 @@ namespace UT.Data
     {
         public static Guid Guid(string input)
         {
-            using MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(input));
+            byte[] hash = MD5.HashData(Encoding.Default.GetBytes(input));
             return new Guid(hash);
         }
     }

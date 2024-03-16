@@ -19,6 +19,8 @@ namespace UT.Data
         #region Properties
         public static string String_InputError { get { return Strings.GetValue("S!InputError"); } }
         public static string String_RequiredField { get { return Strings.GetValue("S!RequiredField"); } }
+        public static string Word_Task { get { return Strings.GetValue("W!Task"); } }
+        public static string String_RegisteredKey { get { return Strings.GetValue("S!RegisteredKey"); } }
         public static Languages? LanguageOverride { get; set; }
         public static Languages Language { 
             get; 
