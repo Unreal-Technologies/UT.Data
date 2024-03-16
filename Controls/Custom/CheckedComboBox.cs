@@ -3,9 +3,9 @@ using System.Text;
 using System.ComponentModel;
 using System.Web;
 
-namespace UT.Data.Controls
+namespace UT.Data.Controls.Custom
 {
-    public class CheckedComboBox : ComboBox 
+    public class CheckedComboBox : ComboBox
     {
         #region Members
         private readonly IContainer? components = null;
@@ -20,103 +20,103 @@ namespace UT.Data.Controls
         #region Constructors
         public CheckedComboBox() : base()
         {
-            this.DrawMode = DrawMode.OwnerDrawVariable;
-            this.valueSeparator = ", ";
-            this.DropDownHeight = 1;
-            this.DropDownStyle = ComboBoxStyle.DropDown;
-            this.dropdown = new Dropdown(this);
-            this.CheckOnClick = true;
+            DrawMode = DrawMode.OwnerDrawVariable;
+            valueSeparator = ", ";
+            DropDownHeight = 1;
+            DropDownStyle = ComboBoxStyle.DropDown;
+            dropdown = new Dropdown(this);
+            CheckOnClick = true;
         }
         #endregion //Constructors
 
         #region Properties
         public string ValueSeparator
         {
-            get { return this.valueSeparator; }
-            set { this.valueSeparator = value; }
+            get { return valueSeparator; }
+            set { valueSeparator = value; }
         }
 
         public bool CheckOnClick
         {
-            get { return this.dropdown != null && this.dropdown.List != null && this.dropdown.List.CheckOnClick; }
-            set { if (this.dropdown != null && this.dropdown.List != null) { this.dropdown.List.CheckOnClick = value; } }
+            get { return dropdown != null && dropdown.List != null && dropdown.List.CheckOnClick; }
+            set { if (dropdown != null && dropdown.List != null) { dropdown.List.CheckOnClick = value; } }
         }
 
         public new string DisplayMember
         {
-            get { return this.dropdown == null || this.dropdown.List == null ? string.Empty : this.dropdown.List.DisplayMember; }
-            set { if (this.dropdown != null && this.dropdown.List != null) { this.dropdown.List.DisplayMember = value; } }
+            get { return dropdown == null || dropdown.List == null ? string.Empty : dropdown.List.DisplayMember; }
+            set { if (dropdown != null && dropdown.List != null) { dropdown.List.DisplayMember = value; } }
         }
 
         public new CheckedListBox.ObjectCollection? Items
         {
-            get { return this.dropdown == null || this.dropdown.List == null ? null : dropdown.List.Items; }
+            get { return dropdown == null || dropdown.List == null ? null : dropdown.List.Items; }
         }
 
         public CheckedListBox.CheckedItemCollection? CheckedItems
         {
-            get { return this.dropdown == null || this.dropdown.List == null ? null : dropdown.List.CheckedItems; }
+            get { return dropdown == null || dropdown.List == null ? null : dropdown.List.CheckedItems; }
         }
 
         public CheckedListBox.CheckedIndexCollection? CheckedIndices
         {
-            get { return this.dropdown == null || this.dropdown.List == null ? null : dropdown.List.CheckedIndices; }
+            get { return dropdown == null || dropdown.List == null ? null : dropdown.List.CheckedIndices; }
         }
 
         public bool ValueChanged
         {
-            get { return this.dropdown != null && dropdown.ValueChanged; }
+            get { return dropdown != null && dropdown.ValueChanged; }
         }
         #endregion //Properties
 
         #region Public Methods
         public bool GetItemChecked(int index)
         {
-            if (index < 0 || index > this.Items?.Count)
+            if (index < 0 || index > Items?.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index), "value out of range");
             }
             else
             {
-                return this.dropdown.List?.GetItemChecked(index) ?? false;
+                return dropdown.List?.GetItemChecked(index) ?? false;
             }
         }
 
         public void SetItemChecked(int index, bool isChecked)
         {
-            if (index < 0 || index > this.Items?.Count)
+            if (index < 0 || index > Items?.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index), "value out of range");
             }
-            else if (this.dropdown != null)
+            else if (dropdown != null)
             {
                 dropdown.List?.SetItemChecked(index, isChecked);
-                this.Text = this.dropdown.GetCheckedItemsStringValue();
+                Text = dropdown.GetCheckedItemsStringValue();
             }
         }
 
         public CheckState GetItemCheckState(int index)
         {
-            if (index < 0 || index > this.Items?.Count)
+            if (index < 0 || index > Items?.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index), "value out of range");
             }
             else
             {
-                return this.dropdown.List?.GetItemCheckState(index) ?? CheckState.Unchecked ;
+                return dropdown.List?.GetItemCheckState(index) ?? CheckState.Unchecked;
             }
         }
 
         public void SetItemCheckState(int index, CheckState state)
         {
-            if (index < 0 || index > this.Items?.Count)
+            if (index < 0 || index > Items?.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index), "value out of range");
             }
             else
             {
-                this.dropdown.List?.SetItemCheckState(index, state);
-                this.Text = this.dropdown.GetCheckedItemsStringValue();
+                dropdown.List?.SetItemCheckState(index, state);
+                Text = dropdown.GetCheckedItemsStringValue();
             }
         }
         #endregion //Public Methods
@@ -124,9 +124,9 @@ namespace UT.Data.Controls
         #region Overrides
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (this.components != null))
+            if (disposing && components != null)
             {
-                this.components.Dispose();
+                components.Dispose();
             }
             base.Dispose(disposing);
         }
@@ -134,7 +134,7 @@ namespace UT.Data.Controls
         protected override void OnDropDown(EventArgs e)
         {
             base.OnDropDown(e);
-            this.DoDropDown();
+            DoDropDown();
         }
 
         protected override void OnDropDownClosed(EventArgs e)
@@ -148,10 +148,10 @@ namespace UT.Data.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)
-            {               
-                this.OnDropDown(EventArgs.Empty);
+            {
+                OnDropDown(EventArgs.Empty);
             }
-            e.Handled = !e.Alt && !(e.KeyCode == Keys.Tab) && !((e.KeyCode == Keys.Left) || (e.KeyCode == Keys.Right) || (e.KeyCode == Keys.Home) || (e.KeyCode == Keys.End));
+            e.Handled = !e.Alt && !(e.KeyCode == Keys.Tab) && !(e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Home || e.KeyCode == Keys.End);
 
             base.OnKeyDown(e);
         }
@@ -160,23 +160,23 @@ namespace UT.Data.Controls
         #region Private Methods
         private void DoDropDown()
         {
-            if (!this.dropdown.Visible)
+            if (!dropdown.Visible)
             {
-                Rectangle rect = RectangleToScreen(this.ClientRectangle);
-                this.dropdown.Location = new Point(rect.X, rect.Y + this.Size.Height);
-                int count = this.dropdown.List?.Items.Count ?? 0;
-                if (count > this.MaxDropDownItems)
+                Rectangle rect = RectangleToScreen(ClientRectangle);
+                dropdown.Location = new Point(rect.X, rect.Y + Size.Height);
+                int count = dropdown.List?.Items.Count ?? 0;
+                if (count > MaxDropDownItems)
                 {
-                    count = this.MaxDropDownItems;
+                    count = MaxDropDownItems;
                 }
                 else if (count == 0)
                 {
                     count = 1;
                 }
-                if (this.dropdown != null)
+                if (dropdown != null)
                 {
-                    this.dropdown.Size = new Size(this.Size.Width, (this.dropdown.List?.ItemHeight ?? 0) * count + 2);
-                    this.dropdown.Show(this);
+                    dropdown.Size = new Size(Size.Width, (dropdown.List?.ItemHeight ?? 0) * count + 2);
+                    dropdown.Show(this);
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace UT.Data.Controls
         #endregion //Private Methods
 
         #region Classes
-        internal class Dropdown : Form 
+        internal class Dropdown : Form
         {
             #region Members
             private readonly CheckedComboBox ccbParent;
@@ -205,13 +205,13 @@ namespace UT.Data.Controls
                 get
                 {
                     string newStrValue = ccbParent.Text;
-                    if ((oldStrValue.Length > 0) && (newStrValue.Length > 0))
+                    if (oldStrValue.Length > 0 && newStrValue.Length > 0)
                     {
-                        return (oldStrValue.CompareTo(newStrValue) != 0);
+                        return oldStrValue.CompareTo(newStrValue) != 0;
                     }
                     else
                     {
-                        return (oldStrValue.Length != newStrValue.Length);
+                        return oldStrValue.Length != newStrValue.Length;
                     }
                 }
             }
@@ -227,12 +227,12 @@ namespace UT.Data.Controls
             public Dropdown(CheckedComboBox ccbParent)
             {
                 this.ccbParent = ccbParent;
-                this.checkedStateArr = [];
-                this.InitializeComponent();
-                this.ShowInTaskbar = false;
-                if (this.cclb != null)
+                checkedStateArr = [];
+                InitializeComponent();
+                ShowInTaskbar = false;
+                if (cclb != null)
                 {
-                    this.cclb.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.Cclb_ItemCheck);
+                    cclb.ItemCheck += new ItemCheckEventHandler(Cclb_ItemCheck);
                 }
             }
             #endregion //Constructors
@@ -241,82 +241,82 @@ namespace UT.Data.Controls
             public string GetCheckedItemsStringValue()
             {
                 StringBuilder sb = new("");
-                if (this.cclb != null)
+                if (cclb != null)
                 {
-                    for (int i = 0; i < this.cclb.CheckedItems.Count; i++)
+                    for (int i = 0; i < cclb.CheckedItems.Count; i++)
                     {
-                        sb.Append(this.cclb.GetItemText(this.cclb.CheckedItems[i])).Append(this.ccbParent.ValueSeparator);
+                        sb.Append(cclb.GetItemText(cclb.CheckedItems[i])).Append(ccbParent.ValueSeparator);
                     }
                 }
                 if (sb.Length > 0)
                 {
-                    sb.Remove(sb.Length - this.ccbParent.ValueSeparator.Length, this.ccbParent.ValueSeparator.Length);
+                    sb.Remove(sb.Length - ccbParent.ValueSeparator.Length, ccbParent.ValueSeparator.Length);
                 }
                 return sb.ToString();
             }
 
             public void CloseDropdown(bool enactChanges)
             {
-                if (this.dropdownClosed)
+                if (dropdownClosed)
                 {
                     return;
                 }
                 if (enactChanges)
                 {
-                    this.ccbParent.SelectedIndex = -1;
-                    this.ccbParent.Text = GetCheckedItemsStringValue();
+                    ccbParent.SelectedIndex = -1;
+                    ccbParent.Text = GetCheckedItemsStringValue();
                 }
-                else if(this.cclb != null)
+                else if (cclb != null)
                 {
-                    for (int i = 0; i < this.cclb.Items.Count; i++)
+                    for (int i = 0; i < cclb.Items.Count; i++)
                     {
-                        this.cclb.SetItemChecked(i, this.checkedStateArr[i]);
+                        cclb.SetItemChecked(i, checkedStateArr[i]);
                     }
                 }
-                this.dropdownClosed = true;
-                this.ccbParent.Focus();
-                this.Hide();
-                this.ccbParent.OnDropDownClosed(new CCBoxEventArgs(null, false));
+                dropdownClosed = true;
+                ccbParent.Focus();
+                Hide();
+                ccbParent.OnDropDownClosed(new CCBoxEventArgs(null, false));
             }
             #endregion //Public Methods
 
             #region Private Methods
             private void InitializeComponent()
             {
-                this.cclb = new CustomCheckedListBox();
-                this.SuspendLayout();
+                cclb = new CustomCheckedListBox();
+                SuspendLayout();
                 // 
                 // cclb
                 // 
-                this.cclb.BorderStyle = BorderStyle.None;
-                this.cclb.Dock = DockStyle.Fill;
-                this.cclb.FormattingEnabled = true;
-                this.cclb.Location = new Point(0, 0);
-                this.cclb.Name = "cclb";
-                this.cclb.Size = new Size(47, 15);
-                this.cclb.TabIndex = 0;
+                cclb.BorderStyle = BorderStyle.None;
+                cclb.Dock = DockStyle.Fill;
+                cclb.FormattingEnabled = true;
+                cclb.Location = new Point(0, 0);
+                cclb.Name = "cclb";
+                cclb.Size = new Size(47, 15);
+                cclb.TabIndex = 0;
                 // 
                 // Dropdown
                 // 
-                this.AutoScaleDimensions = new SizeF(6F, 13F);
-                this.AutoScaleMode = AutoScaleMode.Font;
-                this.BackColor = SystemColors.Menu;
-                this.ClientSize = new Size(47, 16);
-                this.ControlBox = false;
-                this.Controls.Add(this.cclb);
-                this.ForeColor = SystemColors.ControlText;
-                this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-                this.MinimizeBox = false;
-                this.Name = "ccbParent";
-                this.StartPosition = FormStartPosition.Manual;
-                this.ResumeLayout(false);
+                AutoScaleDimensions = new SizeF(6F, 13F);
+                AutoScaleMode = AutoScaleMode.Font;
+                BackColor = SystemColors.Menu;
+                ClientSize = new Size(47, 16);
+                ControlBox = false;
+                Controls.Add(cclb);
+                ForeColor = SystemColors.ControlText;
+                FormBorderStyle = FormBorderStyle.FixedToolWindow;
+                MinimizeBox = false;
+                Name = "ccbParent";
+                StartPosition = FormStartPosition.Manual;
+                ResumeLayout(false);
             }
 
             private void Cclb_ItemCheck(object? sender, ItemCheckEventArgs e)
             {
-                if (this.ccbParent?.ItemCheck != null)
+                if (ccbParent?.ItemCheck != null)
                 {
-                    this.ccbParent.ItemCheck(sender, e);
+                    ccbParent.ItemCheck(sender, e);
                 }
             }
             #endregion //Private Methods
@@ -325,14 +325,14 @@ namespace UT.Data.Controls
             protected override void OnActivated(EventArgs e)
             {
                 base.OnActivated(e);
-                this.dropdownClosed = false;
-                this.oldStrValue = this.ccbParent.Text;
-                if (this.cclb != null)
+                dropdownClosed = false;
+                oldStrValue = ccbParent.Text;
+                if (cclb != null)
                 {
-                    this.checkedStateArr = new bool[this.cclb.Items.Count];
-                    for (int i = 0; i < this.cclb.Items.Count; i++)
+                    checkedStateArr = new bool[cclb.Items.Count];
+                    for (int i = 0; i < cclb.Items.Count; i++)
                     {
-                        this.checkedStateArr[i] = this.cclb.GetItemChecked(i);
+                        checkedStateArr[i] = cclb.GetItemChecked(i);
                     }
                 }
             }
@@ -342,18 +342,18 @@ namespace UT.Data.Controls
                 base.OnDeactivate(e);
                 if (e is CCBoxEventArgs ce)
                 {
-                    this.CloseDropdown(ce.AssignValues);
+                    CloseDropdown(ce.AssignValues);
 
                 }
                 else
                 {
-                    this.CloseDropdown(true);
+                    CloseDropdown(true);
                 }
             }
             #endregion //Overrides
 
             #region Classes
-            internal class CCBoxEventArgs(EventArgs? e, bool assignValues) : EventArgs() 
+            internal class CCBoxEventArgs(EventArgs? e, bool assignValues) : EventArgs()
             {
                 #region Members
                 private bool assignValues = assignValues;
@@ -361,13 +361,13 @@ namespace UT.Data.Controls
                 #endregion //Members
 
                 #region Properties
-                public bool AssignValues 
+                public bool AssignValues
                 {
-                    get { return this.assignValues; }
-                    set { this.assignValues = value; }
+                    get { return assignValues; }
+                    set { assignValues = value; }
                 }
-                
-                public EventArgs? EventArgs 
+
+                public EventArgs? EventArgs
                 {
                     get { return e; }
                     set { e = value; }
@@ -375,36 +375,38 @@ namespace UT.Data.Controls
                 #endregion //Properties
             }
 
-            internal class CustomCheckedListBox : CheckedListBox 
+            internal class CustomCheckedListBox : CheckedListBox
             {
                 #region Members
                 private int curSelIndex = -1;
                 #endregion //Members
 
                 #region Constructors
-                public CustomCheckedListBox() : base() 
+                public CustomCheckedListBox() : base()
                 {
-                    this.SelectionMode = SelectionMode.One;
-                    this.HorizontalScrollbar = true;                    
+                    SelectionMode = SelectionMode.One;
+                    HorizontalScrollbar = true;
                 }
                 #endregion //Constructors
 
                 #region Overrides
-                protected override void OnKeyDown(KeyEventArgs e) 
+                protected override void OnKeyDown(KeyEventArgs e)
                 {
-                    if (e.KeyCode == Keys.Enter) 
+                    if (e.KeyCode == Keys.Enter)
                     {
-                        ((CheckedComboBox.Dropdown?)this.Parent)?.OnDeactivate(new CCBoxEventArgs(null, true));
+                        ((Dropdown?)Parent)?.OnDeactivate(new CCBoxEventArgs(null, true));
                         e.Handled = true;
 
-                    } else if (e.KeyCode == Keys.Escape) 
+                    }
+                    else if (e.KeyCode == Keys.Escape)
                     {
-                        ((CheckedComboBox.Dropdown?)this.Parent)?.OnDeactivate(new CCBoxEventArgs(null, false));
+                        ((Dropdown?)Parent)?.OnDeactivate(new CCBoxEventArgs(null, false));
                         e.Handled = true;
 
-                    } else if (e.KeyCode == Keys.Delete)
+                    }
+                    else if (e.KeyCode == Keys.Delete)
                     {
-                        for (int i = 0; i < Items.Count; i++) 
+                        for (int i = 0; i < Items.Count; i++)
                         {
                             SetItemChecked(i, e.Shift);
                         }
@@ -413,11 +415,11 @@ namespace UT.Data.Controls
                     base.OnKeyDown(e);
                 }
 
-                protected override void OnMouseMove(MouseEventArgs e) 
+                protected override void OnMouseMove(MouseEventArgs e)
                 {
                     base.OnMouseMove(e);
                     int index = IndexFromPoint(e.Location);
-                    if ((index >= 0) && (index != curSelIndex)) 
+                    if (index >= 0 && index != curSelIndex)
                     {
                         curSelIndex = index;
                         SetSelected(index, true);
@@ -430,5 +432,5 @@ namespace UT.Data.Controls
         }
         #endregion //Classes
     }
-    
+
 }

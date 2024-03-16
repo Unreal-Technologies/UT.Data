@@ -1,4 +1,4 @@
-namespace UT.Data.Controls
+namespace UT.Data.Controls.Custom
 {
     public class CcbItem
     {
@@ -24,8 +24,8 @@ namespace UT.Data.Controls
         #region Constructors
         public CcbItem()
         {
-            this.val = int.MinValue;
-            this.name = string.Empty;
+            val = int.MinValue;
+            name = string.Empty;
         }
 
         public CcbItem(string name, int val)
