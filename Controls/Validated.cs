@@ -9,7 +9,6 @@ namespace UT.Data.Controls
         [AllowNull]
         private readonly T control;
         private readonly Label symbol;
-        private readonly ToolTip tooltip;
         private bool isRequired = false;
         private bool isValid = false;
         private readonly ValueHandler valueHandler;
@@ -25,24 +24,16 @@ namespace UT.Data.Controls
 
         #region Delegates
         public delegate string? ValueHandler(T control);
+        public delegate Tuple<bool, string> ExtraValidationHandler(T control);
         #endregion //Delegates
+
+        #region Events
+        private event ExtraValidationHandler? ExtraValidation;
+        #endregion //Events
 
         #region Constructors
         public Validated(ValueHandler handler)
         {
-            this.tooltip = new()
-            {
-                ShowAlways = true,
-                ToolTipTitle = Strings.String_InputError,
-                ToolTipIcon = ToolTipIcon.Error,
-                IsBalloon = true,
-                InitialDelay = 0,
-                Active = true,
-                AutomaticDelay = 0,
-                ReshowDelay = 0,
-                AutoPopDelay = 0,
-            };
-
             this.valueHandler = handler;
             T? temp = (T?)Activator.CreateInstance(typeof(T));
             if(temp != null)
@@ -64,6 +55,11 @@ namespace UT.Data.Controls
         #endregion //Constructors
 
         #region Public Methods
+        public void AddValidation(ExtraValidationHandler validation)
+        {
+            this.ExtraValidation += validation;
+        }
+
         public void Validate()
         {
             this.isValid = true;
@@ -78,9 +74,26 @@ namespace UT.Data.Controls
                 return;
             }
 
-            if (text != null)
+            if (text != null && this.ExtraValidation != null && this.isValid)
             {
-
+                List<string> buffer = [];
+                foreach (Delegate delegateItem in this.ExtraValidation.GetInvocationList())
+                {
+                    ExtraValidationHandler? handler = delegateItem as ExtraValidationHandler;
+                    Tuple<bool, string>? output = handler?.Invoke(control);
+                    if(output != null)
+                    {
+                        if(!output.Item1)
+                        {
+                            buffer.Add(output.Item2);
+                            this.isValid = false;
+                        }
+                    }
+                }
+                if (!this.isValid)
+                {
+                    this.SetError(string.Join("\r\n", buffer));
+                }
             }
         }
         #endregion //Public Methods
@@ -93,15 +106,27 @@ namespace UT.Data.Controls
 
         private void SetError(string? text = null)
         {
+            ToolTip tooltip = new()
+            {
+                ShowAlways = true,
+                ToolTipTitle = Strings.String_InputError,
+                ToolTipIcon = ToolTipIcon.Error,
+                IsBalloon = true,
+                InitialDelay = 1,
+                AutomaticDelay = 1,
+                ReshowDelay = 1,
+                AutoPopDelay = 1,
+            };
+
             bool isError = text != null;
             if (isError)
             {
-                this.tooltip.SetToolTip(this.control, text);
+                tooltip.SetToolTip(this.control, text);
+                tooltip.Show(text, this.control, this.control.Width, 0, 3000);
                 this.control.BackColor = Color.Red;
             }
             else
             {
-                this.tooltip.RemoveAll();
                 this.control.BackColor = this.defaultBackColor;
             }
         }
