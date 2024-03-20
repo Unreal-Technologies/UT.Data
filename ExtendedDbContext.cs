@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Net;
+using System.Reflection;
 using UT.Data.Attributes;
 
 namespace UT.Data
@@ -40,6 +42,8 @@ namespace UT.Data
             this.config.Add(Parameters.Password, password);
             this.config.Add(Parameters.Database, db);
             this.config.Add(Parameters.Type, type);
+
+            this.SavingChanges += ExtendedDbContext_SavingChanges;
         }
         #endregion //Constructors
 
@@ -61,5 +65,28 @@ namespace UT.Data
             }
         }
         #endregion //Overrides
+
+        #region Private Methods
+        private void ExtendedDbContext_SavingChanges(object? sender, SavingChangesEventArgs e)
+        {
+            if (sender is not DbContext context)
+            {
+                return;
+            }
+
+            foreach (EntityEntry entry in context.ChangeTracker.Entries())
+            {
+                if (entry.State != EntityState.Added && entry.State != EntityState.Modified)
+                {
+                    continue;
+                }
+
+                object entity = entry.Entity;
+                Type type = entity.GetType();
+                PropertyInfo? transstartdate = type.GetProperty("TransStartDate");
+                transstartdate?.SetValue(entity, DateTime.Now);
+            }
+        }
+        #endregion //Private Methods
     }
 }
