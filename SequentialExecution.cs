@@ -79,7 +79,7 @@
             Tuple<Task, string> data = this.tasks[this.position];
             string title = data.Item2;
 
-            string composed = "Task " + progression + ", " + title + (text == null ? "" : ": " + text);
+            string composed = Strings.Word_Task + " " + progression + ", " + title + (text == null ? "" : ": " + text);
             this.Output(composed, this.isValid);
             Thread.Sleep(25);
         }

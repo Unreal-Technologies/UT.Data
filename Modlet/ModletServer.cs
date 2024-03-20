@@ -97,7 +97,7 @@ namespace UT.Data.Modlet
                         string unique = Hashing.Guid(ep.ToString() + "/" + computer + "/" + this.semiRand).ToString();
                         this.keys.Add(lockKey, unique);
                         key = unique;
-                        ExtendedConsole.WriteLine("Registered key: <yellow>" + unique + "</yellow> for <cyan>" + lockKey + "</cyan>");
+                        ExtendedConsole.WriteLine(string.Format(Strings.String_RegisteredKey, unique, lockKey));
                     }
                     dsOut = new Dataset(ModletCommands.Commands.Response, ASCIIEncoding.UTF8.GetBytes(key), null);
                     break;

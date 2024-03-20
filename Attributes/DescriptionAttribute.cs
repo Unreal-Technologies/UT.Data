@@ -1,21 +1,15 @@
 ﻿namespace UT.Data.Attributes
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
-    public class DescriptionAttribute : Attribute
+    public class DescriptionAttribute(string text) : Attribute
     {
         #region Members
-        private readonly string _text;
+        private readonly string _text = text;
         #endregion //Members
 
         #region Properties
         public string Text { get { return this._text; } }
-        #endregion //Properties
 
-        #region Constructors
-        public DescriptionAttribute(string text)
-        {
-            this._text = text;
-        }
-        #endregion //Constructors
+        #endregion //Properties
     }
 }

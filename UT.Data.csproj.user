@@ -2,13 +2,16 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
-    <Compile Update="Controls\CheckedComboBox.cs">
+    <Compile Update="Controls\Custom\CheckedComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Controls\Gridview.cs">
+    <Compile Update="Controls\Custom\Gridview.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Controls\GridviewGuid.cs">
+    <Compile Update="Controls\Custom\GridviewGuid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\Validated.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

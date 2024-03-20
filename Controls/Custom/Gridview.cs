@@ -1,4 +1,4 @@
-﻿namespace UT.Data.Controls
+﻿namespace UT.Data.Controls.Custom
 {
     public class Gridview<Tid> : Panel
         where Tid : struct
@@ -43,89 +43,101 @@
         #endregion //Properties
 
         #region Constructors
-        public Gridview(): base()
+        public Gridview() : base()
         {
-            this.columns = [];
-            this.fields = [];
-            this.columnSizes = [];
-            this.rowSizes = [];
+            columns = [];
+            fields = [];
+            columnSizes = [];
+            rowSizes = [];
 
-            this.rows = [];
-            this.ControlLocation = ControlLocations.Left;
-            this.MinimumSize = new Size(20, 20);
+            rows = [];
+            ControlLocation = ControlLocations.Left;
+            MinimumSize = new Size(20, 20);
 
-            this.add = new Button
+            add = new Button
             {
                 Image = Resources.Plus,
                 Size = Resources.Plus.Size
             };
-            this.add.Click += delegate (object? sender, EventArgs e) { this.OnAdd?.Invoke(null); };
+            add.Click += delegate (object? sender, EventArgs e) { OnAdd?.Invoke(null); };
 
-            this.SetColumns([]);
+            SetColumns([]);
         }
         #endregion //Constructors
 
         #region Public Methods
         public void AddRow(Row row)
         {
-            this.rows.Add(row);
-            this.ComposeRows();
+            rows.Add(row);
+            ComposeRows();
         }
 
         public void SetRows(Row[] rows)
         {
+            ClearControlsExceptHeader();
             this.rows.Clear();
             this.rows.AddRange(rows);
-            this.ComposeRows();
+            ComposeRows();
         }
 
         public void SetColumns(Column[] columns)
         {
             this.columns.Clear();
             this.columns.AddRange(columns);
-            this.ComposeHeader();
+            ComposeHeader();
         }
 
         public void AddColumn(Column column)
         {
-            this.columns.Add(column);
-            this.ComposeHeader();
+            columns.Add(column);
+            ComposeHeader();
         }
         #endregion //Public Methods
 
         #region Private Methods
+        private void ClearControlsExceptHeader()
+        {
+            foreach (Control? c in fields.Where(x => x.Item1.Y >= 1).Select(x => x.Item2))
+            {
+                Controls.Remove(c);
+            }
+            Tuple<Point, Control?, Alignment>[] header = fields.Where(x => x.Item1.Y == 0).ToArray();
+            fields.Clear();
+            fields.AddRange(header);
+        }
+
         private void ComposeRows()
         {
             int i = 1;
-            int offset = this.ControlLocation == ControlLocations.Left ? 2 : 0;
+            int offset = ControlLocation == ControlLocations.Left ? 2 : 0;
 
-            for(int r = 0; r<this.rows.Count; r++)
+            for (int r = 0; r < rows.Count; r++)
             {
-                Row row = this.rows[r];
+                Row row = rows[r];
 
                 if (offset != 0)
                 {
                     Button edit = new();
-                    edit.Click += delegate (object? sender, EventArgs e) { this.OnEdit?.Invoke(row.ID); };
+                    edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
                     edit.Image = Resources.Pencil;
                     edit.Size = Resources.Pencil.Size;
                     edit.Enabled = row.Edit == null || row.Edit == true;
 
                     Button remove = new();
-                    remove.Click += delegate (object? sender, EventArgs e) { this.OnRemove?.Invoke(row.ID); };
+                    remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
                     remove.Image = Resources.Delete;
                     remove.Size = Resources.Delete.Size;
                     remove.Enabled = row.Remove == null || row.Remove == true;
 
-                    this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, r + i), edit, Alignment.Left));
-                    this.Controls.Add(edit);
+                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, r + i), edit, Alignment.Left));
+                    Controls.Add(edit);
 
-                    this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, r + i), remove, Alignment.Left));
-                    this.Controls.Add(remove);
+                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, r + i), remove, Alignment.Left));
+                    Controls.Add(remove);
                 }
 
                 int length = row.Cells.Count;
-                for (int c=0; c<length; c++)
+                for (int c = 0; c < length; c++)
                 {
                     Cell cell = row.Cells[c];
                     int index = c + offset;
@@ -136,82 +148,82 @@
                     };
                     if (cell.FontStyle != null)
                     {
-                        l.Font = new Font(this.Font, cell.FontStyle.Value);
+                        l.Font = new Font(Font, cell.FontStyle.Value);
                     }
                     if (cell.Color != null)
                     {
                         l.ForeColor = cell.Color.Value;
                     }
                     Alignment alignment = Alignment.Left;
-                    if(cell.TextAlignment != null)
+                    if (cell.TextAlignment != null)
                     {
                         alignment = cell.TextAlignment.Value;
                     }
 
-                    this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, r + i), l, alignment));
-                    this.Controls.Add(l);
+                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, r + i), l, alignment));
+                    Controls.Add(l);
                 }
 
                 if (offset == 0)
                 {
                     Button edit = new();
-                    edit.Click += delegate (object? sender, EventArgs e) { this.OnEdit?.Invoke(row.ID); };
+                    edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
 
                     Button remove = new();
-                    remove.Click += delegate (object? sender, EventArgs e) { this.OnRemove?.Invoke(row.ID); };
+                    remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
 
-                    this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 0, r + i), edit, Alignment.Left));
-                    this.Controls.Add(edit);
+                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 0, r + i), edit, Alignment.Left));
+                    Controls.Add(edit);
 
-                    this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 1, r + i), remove, Alignment.Left));
-                    this.Controls.Add(remove);
+                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 1, r + i), remove, Alignment.Left));
+                    Controls.Add(remove);
                 }
             }
 
-            this.ComposeSizes();
+            ComposeSizes();
         }
 
         private void ComposeHeader()
         {
-            this.fields.Clear();
-            this.Controls.Clear();
-            this.Controls.Add(this.add);
-            int offset = this.ControlLocation == ControlLocations.Left ? 2 : 0;
+            fields.Clear();
+            Controls.Clear();
+            Controls.Add(add);
+            int offset = ControlLocation == ControlLocations.Left ? 2 : 0;
             if (offset != 0)
             {
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, 0), this.add, Alignment.Left));
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, 0), null, Alignment.Left));
+                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, 0), add, Alignment.Left));
+                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, 0), null, Alignment.Left));
             }
 
             int i = 0;
-            foreach (Column column in this.columns)
+            foreach (Column column in columns)
             {
                 int index = i + offset;
 
                 Label l = new()
                 {
                     Text = column.Text,
-                    Font = new Font(this.Font, FontStyle.Bold)
+                    Font = new Font(Font, FontStyle.Bold)
                 };
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, 0), l, Alignment.Center));
-                this.Controls.Add(l);
+                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, 0), l, Alignment.Center));
+                Controls.Add(l);
 
                 i++;
             }
 
             if (offset == 0)
             {
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 0, 0), null, Alignment.Left));
-                this.fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 1, 0), this.add, Alignment.Left));
+                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 0, 0), null, Alignment.Left));
+                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 1, 0), add, Alignment.Left));
             }
 
-            this.ComposeSizes();
+            ComposeSizes();
         }
 
         private void ComposeSizes()
         {
-            int maxY = this.fields.Select(x => x.Item1.Y).Max();
-            int maxX = this.fields.Select(x => x.Item1.X).Max();
+            int maxY = fields.Select(x => x.Item1.Y).Max();
+            int maxX = fields.Select(x => x.Item1.X).Max();
 
             Dictionary<int, int> columns = [];
             Dictionary<int, int> rows = [];
@@ -221,16 +233,16 @@
                 for (int x = 0; x <= maxX; x++)
                 {
                     Point location = new(x, y);
-                    Control? control = this.fields.Where(x => x.Item1.X == location.X && x.Item1.Y == location.Y).Select(x => x.Item2).FirstOrDefault();
+                    Control? control = fields.Where(x => x.Item1.X == location.X && x.Item1.Y == location.Y).Select(x => x.Item2).FirstOrDefault();
 
                     Size size = new(0, 0);
-                    if(control != null)
+                    if (control != null)
                     {
                         control.Size = control.PreferredSize;
                         size = control.Size;
                     }
 
-                    if(columns.TryGetValue(x, out int valueX))
+                    if (columns.TryGetValue(x, out int valueX))
                     {
                         columns[x] = Math.Max(valueX, size.Width);
                     }
@@ -239,7 +251,7 @@
                         columns.Add(x, size.Width);
                     }
 
-                    if(rows.TryGetValue(y, out int valueY))
+                    if (rows.TryGetValue(y, out int valueY))
                     {
                         rows[y] = Math.Max(valueY, size.Height);
                     }
@@ -250,17 +262,17 @@
                 }
             }
 
-            this.columnSizes = columns;
-            this.rowSizes = rows;
+            columnSizes = columns;
+            rowSizes = rows;
 
-            this.PositionControls();
+            PositionControls();
         }
 
         private void PositionControls()
         {
             int padding = Gridview<Tid>.Padding;
-            Dictionary<int, int> rows = this.rowSizes;
-            Dictionary<int, int> columns = this.columnSizes;
+            Dictionary<int, int> rows = rowSizes;
+            Dictionary<int, int> columns = columnSizes;
 
             int maxY = rows.Keys.Max();
             int maxX = columns.Keys.Max();
@@ -274,8 +286,8 @@
                     Point index = new(x, y);
                     Size size = new(columns[x], rows[y]);
 
-                    Tuple<Control?, Alignment>? data = this.fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment>(x.Item2, x.Item3)).FirstOrDefault();
-                    if(data == null)
+                    Tuple<Control?, Alignment>? data = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment>(x.Item2, x.Item3)).FirstOrDefault();
+                    if (data == null)
                     {
                         continue;
                     }
@@ -286,8 +298,8 @@
                     if (control != null)
                     {
                         control.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                        control.Location = new Point(offsetX, offsetY + ((size.Height - control.Height) / 2)); //Default Left Align
-                        if(alignment == Alignment.Right)
+                        control.Location = new Point(offsetX, offsetY + (size.Height - control.Height) / 2); //Default Left Align
+                        if (alignment == Alignment.Right)
                         {
                             int baseX = control.Location.X;
                             int newX = baseX + (size.Width - control.Width);
@@ -296,7 +308,7 @@
                         else if (alignment == Alignment.Center)
                         {
                             int baseX = control.Location.X;
-                            int newX = baseX + ((size.Width - control.Width) / 2);
+                            int newX = baseX + (size.Width - control.Width) / 2;
                             control.Location = new Point(newX, control.Location.Y);
                         }
                     }
@@ -304,18 +316,18 @@
                 }
                 offsetY += rows.Values.Max() + padding;
             }
-            this.Size = this.PreferredSize;
+            Size = PreferredSize;
         }
 
         private void DrawHorizontalLines(Graphics g)
         {
             int padding = Gridview<Tid>.Padding;
             Pen p = Pens.Black;
-            int w = this.columnSizes.Values.Sum() + (this.columnSizes.Count * padding);
+            int w = columnSizes.Values.Sum() + columnSizes.Count * padding;
 
-            for (int yI = 1; yI < this.rowSizes.Count; yI++)
+            for (int yI = 1; yI < rowSizes.Count; yI++)
             {
-                int y = this.rowSizes.Values.Take(yI).Sum() + (yI * padding) + (padding / 2);
+                int y = rowSizes.Values.Take(yI).Sum() + yI * padding + padding / 2;
 
                 g.DrawLine(p, new PointF(0, y), new PointF(w, y));
             }
@@ -325,14 +337,14 @@
         {
             int padding = Gridview<Tid>.Padding;
             Pen p = Pens.Black;
-            int h = this.rowSizes.Values.Sum() + (this.rowSizes.Count * padding);
+            int h = rowSizes.Values.Sum() + rowSizes.Count * padding;
 
-            int offset = this.ControlLocation == ControlLocations.Left ? 2 : 0;
+            int offset = ControlLocation == ControlLocations.Left ? 2 : 0;
             int offsetInverse = 2 - offset;
 
-            for (int xI = offset; xI < this.columnSizes.Count - offsetInverse; xI++)
+            for (int xI = offset; xI < columnSizes.Count - offsetInverse; xI++)
             {
-                int x = this.columnSizes.Values.Take(xI).Sum() + (xI * padding) + (padding / 2);
+                int x = columnSizes.Values.Take(xI).Sum() + xI * padding + padding / 2;
 
                 g.DrawLine(p, new PointF(x, 0), new PointF(x, h));
             }
@@ -345,8 +357,8 @@
             base.OnPaint(e);
             Graphics g = e.Graphics;
 
-            this.DrawHorizontalLines(g);
-            this.DrawVerticalLines(g);
+            DrawHorizontalLines(g);
+            DrawVerticalLines(g);
         }
         #endregion //Overrides
 
@@ -363,7 +375,7 @@
             #region Constructors
             public Row()
             {
-                this.Cells = [];
+                Cells = [];
             }
             #endregion //Constructors
         }
