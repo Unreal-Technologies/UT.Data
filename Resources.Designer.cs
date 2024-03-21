@@ -71,24 +71,6 @@ namespace UT.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to S!InputError=Input Error.
-        /// </summary>
-        internal static string En {
-            get {
-                return ResourceManager.GetString("En", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to S!InputError=Invoer Fout.
-        /// </summary>
-        internal static string Nl {
-            get {
-                return ResourceManager.GetString("Nl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Pencil {

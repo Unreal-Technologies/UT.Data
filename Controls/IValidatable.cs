@@ -10,6 +10,7 @@
 
         #region Public Methods
         public void Validate();
+        public void SetError(string text);
         #endregion //Public Methods
     }
 

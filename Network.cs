@@ -9,10 +9,17 @@ namespace UT.Data
         #region Public Methods
         public static bool IsServerReachable(IPAddress ip, int port)
         {
-            TcpClient tcpClient = new();
+            TcpClient tcpClient = new()
+            {
+                SendTimeout = 1000,
+                ReceiveTimeout = 1000,
+            };
             try
             {
-                tcpClient.Connect(ip, port);
+                if(!tcpClient.ConnectAsync(ip, port).Wait(1000))
+                {
+                    return false;
+                }
                 tcpClient.Close();
 
                 return true;

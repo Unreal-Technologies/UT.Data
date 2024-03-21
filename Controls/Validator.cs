@@ -15,6 +15,16 @@
         #endregion //Properties
 
         #region Public Methods
+        public void SetError<T>(IValidatable<T>? control, string text)
+            where T: Control
+        {
+            if(control == null || !this.list.Contains(control))
+            {
+                return;
+            }
+            control.SetError(text);
+        }
+
         public void Add<T>(IValidatable<T>? control)
             where T: Control
         {
@@ -35,6 +45,11 @@
                     this.isValid = false;
                 }
             }
+        }
+
+        public void SetError(string text)
+        {
+            throw new NotImplementedException();
         }
         #endregion //Public Methods
     }

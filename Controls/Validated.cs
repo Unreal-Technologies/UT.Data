@@ -5,6 +5,10 @@ namespace UT.Data.Controls
     public class Validated<T> : Panel, IValidatable<T>
         where T: Control
     {
+        #region Constants
+        private const int InterControlPadding = 3;
+        #endregion //Constants
+
         #region Members
         [AllowNull]
         private readonly T control;
@@ -17,7 +21,7 @@ namespace UT.Data.Controls
 
         #region Properties
         public T Control { get { return this.control; } }
-        public bool IsRequired { get { return this.isRequired; } set { this.isRequired = value; this.SetSymbol(); } }
+        public bool IsRequired { get { return this.isRequired; } set { this.isRequired = value; this.symbol.Visible = value; } }
         public bool IsValid { get { return this.isValid; } }
         Control IValidatable.Control { get { return this.control; } }
         #endregion //Properties
@@ -38,20 +42,31 @@ namespace UT.Data.Controls
             T? temp = (T?)Activator.CreateInstance(typeof(T));
             if(temp != null)
             {
-                temp.SizeChanged += Temp_SizeChanged;
+                temp.Size = temp.PreferredSize;
+                temp.Dock = DockStyle.Left;
                 this.control = temp;
             }
             this.defaultBackColor = this.control?.BackColor ?? this.BackColor;
             this.symbol = new()
             {
                 Text = "*",
-                Font = new Font(this.Font.FontFamily, 11, FontStyle.Bold),
+                Font = new Font(this.Font.FontFamily, 10, FontStyle.Bold),
                 ForeColor = Color.DarkRed,
-                Location = new Point(this.Location.X + this.Width + 1, this.Location.Y)
+                Visible = false,
+                Dock = DockStyle.Right
             };
 
             this.Controls.Add(this.control);
+            this.Controls.Add(this.symbol);
+
+            this.symbol.Size = this.symbol.PreferredSize;
+            if(this.control == null)
+            {
+                return;
+            }
+            this.SizeChanged += Validated_SizeChanged;
         }
+
         #endregion //Constructors
 
         #region Public Methods
@@ -69,7 +84,7 @@ namespace UT.Data.Controls
             this.ClearError();
             if ((text == null || text == string.Empty) && this.isRequired)
             {
-                this.SetError(Strings.String_RequiredField);
+                this.SetErrorInternal("This field is required");
                 this.isValid = false;
                 return;
             }
@@ -92,7 +107,7 @@ namespace UT.Data.Controls
                 }
                 if (!this.isValid)
                 {
-                    this.SetError(string.Join("\r\n", buffer));
+                    this.SetErrorInternal(string.Join("\r\n", buffer));
                 }
             }
         }
@@ -101,15 +116,21 @@ namespace UT.Data.Controls
         #region Private Methods
         private void ClearError()
         {
-            this.SetError(null);
+            this.SetErrorInternal(null);
         }
 
-        private void SetError(string? text = null)
+        public void SetError(string text)
+        {
+            this.isValid = false;
+            this.SetErrorInternal(text);
+        }
+
+        private void SetErrorInternal(string? text = null)
         {
             ToolTip tooltip = new()
             {
                 ShowAlways = true,
-                ToolTipTitle = Strings.String_InputError,
+                ToolTipTitle = "Input Error",
                 ToolTipIcon = ToolTipIcon.Error,
                 IsBalloon = true,
                 InitialDelay = 1,
@@ -131,25 +152,10 @@ namespace UT.Data.Controls
             }
         }
 
-        private void Temp_SizeChanged(object? sender, EventArgs e)
+        private void Validated_SizeChanged(object? sender, EventArgs e)
         {
-            this.symbol.Location = new Point(this.control.Location.X + this.control.Width + 1, this.control.Location.Y);
-            this.Size = this.PreferredSize;
-        }
-
-        private void SetSymbol()
-        {
-            if (this.isRequired && this.symbol != null)
-            {
-                this.Controls.Add(this.symbol);
-                this.symbol.Size = this.symbol.PreferredSize;
-            }
-            else if (this.symbol != null)
-            {
-                this.symbol.Location = new Point(this.Location.X + this.Width + 1, this.Location.Y);
-                this.Controls.Remove(this.symbol);
-            }
-            this.Size = this.PreferredSize;
+            int width = this.Width;
+            this.control.Width = width - this.symbol.Width - Validated<T>.InterControlPadding;
         }
         #endregion //Private Methods
     }

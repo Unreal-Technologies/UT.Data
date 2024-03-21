@@ -14,5 +14,17 @@
     <Compile Update="Controls\Validated.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="Controls\Validated\ValidatedComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\Validated\ValidatedIpAddress.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\Validated\ValidatedNumericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\Validated\ValidatedTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

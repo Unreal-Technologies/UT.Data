@@ -24,6 +24,11 @@ namespace UT.Data.IO
         #endregion //Constructors
 
         #region Properties
+        public string Path
+        {
+            get { return this.location.Name; }
+        }
+
         public bool Exists
         {
             get { return this.location.Exists; }
