@@ -41,13 +41,13 @@ namespace UT.Data.Modlet
         #endregion //Constructors
 
         #region Public Methods
-        public bool Register(IModlet module, DbContext? context, ref Dictionary<string, object?> configuration)
+        public bool Register(IModlet module, DbContext? context)
         {
             if(this.modules == null)
             {
                 return false;
             }
-            module.OnServerConfiguration(context, ref configuration);
+            module.OnServerConfiguration(context);
             this.modules.Add(module);
             return true;
         }

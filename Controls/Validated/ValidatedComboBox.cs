@@ -7,7 +7,6 @@
             return cb.SelectedItem?.ToString();
         })
         {
-
         }
     }
 }

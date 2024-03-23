@@ -45,7 +45,7 @@ namespace UT.Data
         #endregion //Overrides
 
         #region Public Methods
-        public static Configuration? CreateConnection(Types type, IPAddress ip, int port, string username, string password, string db)
+        public static Configuration? CreateConnection(Types type, IPAddress ip, int port, string username, string? password, string db)
         {
             return type switch
             {
@@ -54,7 +54,7 @@ namespace UT.Data
             };
         }
 
-        public static Configuration CreateMysqlConnection(IPAddress ip, int port, string username, string password, string db)
+        public static Configuration CreateMysqlConnection(IPAddress ip, int port, string username, string? password, string db)
         {
             string connection = "server={0};port={1};database={2};user={3};password={4};";
 

@@ -108,7 +108,6 @@ namespace UT.Data.IO.Assemblies
                 }
                 else
                 {
-                    
                     throw new NotImplementedException();
                 }
             }
