@@ -2,9 +2,21 @@
 {
     public partial class ExtendedForm : Form
     {
+        #region Members
+        private string text;
+        #endregion //Members
+
         #region Properties
-        public InfoBar InfoBar { 
+        public InfoBar InfoBar 
+        { 
             get { return this.infoBar1; } 
+        }
+
+        public string Title { get; set; }
+        public new string Text 
+        {
+            get { return Title + (Title != string.Empty && text != string.Empty ? " - " : string.Empty) + text; }
+            set { text = value; }
         }
         #endregion //Properties
 
@@ -13,6 +25,8 @@
         {
             Icon = Resources.Favicon;
             Font = new Font(FontFamily.GenericMonospace, 9);
+            Title = string.Empty;
+            text = string.Empty;
 
             InitializeComponent();
 

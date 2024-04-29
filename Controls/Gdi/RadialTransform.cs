@@ -134,7 +134,7 @@ namespace UT.Data.Controls.Gdi
                         brR.IntersectsWith(childBounds) ? bottomRightRadial : SizeF.Empty,
                     ];
 
-                    buffer.Add(child, child.RadialTransform(radials[0], radials[1], radials[2], radials[3]));
+                    buffer.Add(child, child.RadialTransform(radials[0], radials[1], radials[2], radials[3], query, color));
                 }
             }
             children = buffer;

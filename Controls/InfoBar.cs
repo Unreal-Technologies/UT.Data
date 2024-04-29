@@ -3,75 +3,90 @@
     public class InfoBar : Panel
     {
         #region Members
-        private readonly PictureBox btnClose;
-        private readonly GdiLabel gdiClose;
-        private readonly PictureBox icon;
-        private readonly Label title;
+        private readonly PictureBox pbClose;
+        private readonly PictureBox pbIcon;
+        private readonly Label lblTitle;
         #endregion //Members
 
         #region Properties
-        public PictureBox Close { get { return btnClose; } }
+        public PictureBox Close { get { return pbClose; } }
+        public new string Text 
+        { 
+            get { return lblTitle.Text; }
+            set 
+            { 
+                lblTitle.Text = value; 
+                lblTitle.Size = lblTitle.PreferredSize; 
+                lblTitle.BringToFront(); 
+                PositionTitle(); 
+            }
+        }
         #endregion //Properties
 
         public InfoBar()
             : base()
         {
-            btnClose = new PictureBox
+            pbClose = new PictureBox
             {
                 Image = Resources.Delete,
                 SizeMode = PictureBoxSizeMode.CenterImage,
                 Size = new Size(75, 50),
                 Dock = DockStyle.Right
             };
-            btnClose.MouseEnter += BtnClose_MouseEnter;
-            btnClose.MouseLeave += BtnClose_MouseLeave;
+            pbClose.MouseEnter += PictureBox_MouseEnter;
+            pbClose.MouseLeave += PictureBox_MouseLeave;
 
-            gdiClose = new GdiLabel
-            {
-                DrawShadow = true,
-                Location = btnClose.Location,
-                Size = btnClose.Size
-            };
-
-            icon = new PictureBox
+            pbIcon = new PictureBox
             {
                 Size = new Size(50, 50),
                 Dock = DockStyle.Left,
                 SizeMode = PictureBoxSizeMode.CenterImage
             };
 
-            title = new Label()
+            lblTitle = new Label()
             {
-                Dock = DockStyle.Fill
+                Location = new Point(50, 0),
+                Font = new Font(Font.FontFamily, 16, FontStyle.Bold),
+                ForeColor = SystemColors.Highlight
             };
 
-            int h = new int[] { btnClose.Height, icon.Height, title.Height }.OrderByDescending(x => x).FirstOrDefault();
-            int w = new int[] { btnClose.Width, icon.Width, title.Width }.Sum();
+            int h = new int[] { pbClose.Height, pbIcon.Height, lblTitle.Height }.OrderByDescending(x => x).FirstOrDefault();
+            int w = new int[] { pbClose.Width, pbIcon.Width, lblTitle.Width }.Sum();
 
-            this.Controls.Add(btnClose);
-            this.Controls.Add(icon);
-            this.Controls.Add(title);
+            this.Controls.Add(pbClose);
+            this.Controls.Add(pbIcon);
+            this.Controls.Add(lblTitle);
 
             MinimumSize = new Size(w, h);
             MaximumSize = new Size(int.MaxValue, h);
 
             ParentChanged += InfoBar_ParentChanged;
+            BackColor = Color.LightGoldenrodYellow;
         }
 
-        private void BtnClose_MouseLeave(object? sender, EventArgs e)
+        #region Private Methods
+        private void PictureBox_MouseLeave(object? sender, EventArgs e)
         {
             if (sender is PictureBox pb)
             {
-                pb.BackColor = SystemColors.Control;
+                pb.BackColor = BackColor;
             }
         }
 
-        private void BtnClose_MouseEnter(object? sender, EventArgs e)
+        private void PictureBox_MouseEnter(object? sender, EventArgs e)
         {
             if(sender is PictureBox pb)
             {
-                pb.BackColor = SystemColors.ControlDark;
+                pb.BackColor = Color.YellowGreen;
             }
+        }
+
+        private void PositionTitle()
+        {
+            int y = (pbIcon.Height - lblTitle.Height) / 2;
+            int x = pbIcon.Width + 5;
+
+            lblTitle.Location = new Point(x, y);
         }
 
         private void InfoBar_ParentChanged(object? sender, EventArgs e)
@@ -85,9 +100,10 @@
                 }
                 if(parent is Form form)
                 {
-                    icon.Image = form.Icon?.ToBitmap();
+                    pbIcon.Image = form.Icon?.ToBitmap();
                 }
             }
         }
+        #endregion //Private Methods
     }
 }
