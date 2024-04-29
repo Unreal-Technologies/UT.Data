@@ -4,6 +4,7 @@
     {
         #region Members
         private readonly PictureBox btnClose;
+        private readonly GdiLabel gdiClose;
         private readonly PictureBox icon;
         private readonly Label title;
         #endregion //Members
@@ -21,6 +22,15 @@
                 SizeMode = PictureBoxSizeMode.CenterImage,
                 Size = new Size(75, 50),
                 Dock = DockStyle.Right
+            };
+            btnClose.MouseEnter += BtnClose_MouseEnter;
+            btnClose.MouseLeave += BtnClose_MouseLeave;
+
+            gdiClose = new GdiLabel
+            {
+                DrawShadow = true,
+                Location = btnClose.Location,
+                Size = btnClose.Size
             };
 
             icon = new PictureBox
@@ -46,6 +56,22 @@
             MaximumSize = new Size(int.MaxValue, h);
 
             ParentChanged += InfoBar_ParentChanged;
+        }
+
+        private void BtnClose_MouseLeave(object? sender, EventArgs e)
+        {
+            if (sender is PictureBox pb)
+            {
+                pb.BackColor = SystemColors.Control;
+            }
+        }
+
+        private void BtnClose_MouseEnter(object? sender, EventArgs e)
+        {
+            if(sender is PictureBox pb)
+            {
+                pb.BackColor = SystemColors.ControlDark;
+            }
         }
 
         private void InfoBar_ParentChanged(object? sender, EventArgs e)

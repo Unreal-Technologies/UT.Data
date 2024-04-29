@@ -1,11 +1,32 @@
 ﻿using UT.Data.Extensions;
+using UT.Data.Forms;
 
 namespace UT.Data.Controls
 {
-    public class GdiText : Panel
+    public class GdiLabel : Panel
     {
+        #region Members;
+        private string text = string.Empty;
+        #endregion //Members
+
         #region Properties;
-        public new string Text { get; set; }
+        public new string Text { 
+            get { return text; }
+            set
+            {
+                Invoker<GdiLabel>.Invoke(this, (GdiLabel gdi, object[]? param) =>
+                {
+                    Control? parent = gdi.Parent;
+                    if (parent != null) //Refresh GDI Hack for transparency
+                    {
+                        parent.Controls.Remove(gdi);
+                        parent.Controls.Add(gdi);
+                        gdi.BringToFront();
+                    }
+                });
+                text = value;
+            }
+        }
         public StringAlignment HorizontalAlignment { get; set; }
         public StringAlignment VerticalAlignment { get; set; }
         public bool DrawShadow { get; set; }
@@ -13,8 +34,9 @@ namespace UT.Data.Controls
         public bool DrawBackground { get; set; }
         public int Opacity { get; set; }
         public Color BackgroundColor { get; set; }
+        public Color ShadowColor { get; set; }
 
-        protected override CreateParams CreateParams
+        protected override CreateParams CreateParams //Transparency hack
         {
             get
             {
@@ -33,9 +55,9 @@ namespace UT.Data.Controls
         #endregion //Enums
 
         #region Constructor
-        public GdiText()
+        public GdiLabel()
         {
-            Text = "--text--";
+            Text = string.Empty;
             BackColor = Color.Transparent;
             BorderStyle = BorderStyle.None;
             HorizontalAlignment = StringAlignment.Near;
@@ -44,38 +66,46 @@ namespace UT.Data.Controls
             Shadow = Shadows.BottomRight;
             Opacity = 0x7f;
             BackgroundColor = Color.Gray;
+            ShadowColor = Color.Black;
         }
+
         #endregion //Constructors
 
         #region Protected Methods
-        protected override void OnPaintBackground(PaintEventArgs e)
+        protected override void OnPaintBackground(PaintEventArgs e) //Transparency Hack
         {
             // Method intentionally left empty.
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void OnPaint(PaintEventArgs e) //Paint content transparent
         {
             Graphics graphics = e.Graphics;
 
-            if(DrawBackground)
+            if (DrawBackground)
             {
                 Brush backgroundBrush = new SolidBrush(Color.FromArgb(Opacity, BackgroundColor));
                 graphics.FillRectangle(backgroundBrush, DisplayRectangle);
             }
 
-            if(DrawShadow)
+            if (DrawShadow)
             {
                 Point shadow = GetShadow(Shadow);
                 RectangleF shadowBounds = new(
-                    ((PointF)DisplayRectangle.Location).IncrementX(shadow.X).IncrementY(shadow.Y), 
+                    new PointF(DisplayRectangle.Location.X, DisplayRectangle.Location.Y).IncrementX(shadow.X).IncrementY(shadow.Y),
                     DisplayRectangle.Size
                 );
-                Drawstring(shadowBounds, Brushes.Black, graphics);
+                Drawstring(
+                    shadowBounds,
+                    new SolidBrush(ShadowColor),
+                    graphics
+                );
             }
 
-            RectangleF textbounds = DisplayRectangle;
-            Brush textBrush = new SolidBrush(ForeColor);
-            Drawstring(textbounds, textBrush, graphics);
+            Drawstring(
+                DisplayRectangle,
+                new SolidBrush(ForeColor),
+                graphics
+            );
 
             base.OnPaint(e);
         }

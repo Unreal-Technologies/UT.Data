@@ -2,6 +2,12 @@
 {
     public partial class ExtendedForm : Form
     {
+        #region Properties
+        public InfoBar InfoBar { 
+            get { return this.infoBar1; } 
+        }
+        #endregion //Properties
+
         #region Constructors
         public ExtendedForm() : base()
         {
@@ -12,13 +18,13 @@
 
             this.Resize += ExtendedForm_Resize;
         }
+        #endregion //Constructors
 
+        #region Private Methods
         private void ExtendedForm_Resize(object? sender, EventArgs e)
         {
             infoBar1.Width = Width;
         }
-
-
-        #endregion //Constructors
+        #endregion //Private Methods
     }
 }
