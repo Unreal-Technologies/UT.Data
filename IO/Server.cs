@@ -7,15 +7,24 @@ namespace UT.Data.IO
     public class Server
     {
         #region Members
-        private bool _running = false;
-        private bool _isActive = false;
+        private readonly State state;
         #endregion //Members
 
-        private class ThreadData
+        #region Classes
+        private sealed class State
+        {
+            public bool IsRunning { get; set; }
+            public bool IsActive { get; set; }
+            public bool IsStopped { get { return !IsRunning && IsActive; } }
+            public bool IsListening { get { return IsRunning && IsActive; } }
+        }
+
+        private sealed class ThreadData
         {
             public IPAddress? Ip { get; set; }
             public int Port { get; set; }
         }
+        #endregion //Classes
 
         #region Constructors
         public Server(string[] ip, int port) : this(Server.Parse(ip), port) { }
@@ -26,7 +35,11 @@ namespace UT.Data.IO
 
         public Server(IPAddress[] ip, int[] ports)
         {
-            this._isActive = true;
+            state = new State
+            {
+                IsActive = true
+            };
+
             DirectoryInfo dir = new("Logging");
             if(!dir.Exists)
             {
@@ -37,12 +50,12 @@ namespace UT.Data.IO
             {
                 foreach (int port in ports)
                 {
-                    Thread t = new(new ParameterizedThreadStart(this.InitializerThread));
+                    Thread t = new(new ParameterizedThreadStart(InitializerThread));
                     t.Start(new ThreadData()
                     {
                         Ip = v,
                         Port = port
-                    }); ;
+                    });
                 }
             }
         }
@@ -63,13 +76,13 @@ namespace UT.Data.IO
         #region Public Methods
         public void Start()
         {
-            this._running = true;
+            state.IsRunning = true;
         }
 
         public void Stop()
         {
-            this._running = false;
-            this._isActive = false;
+            state.IsRunning = false;
+            state.IsActive = false;
         }
         #endregion //Public Methods
 
@@ -104,19 +117,19 @@ namespace UT.Data.IO
             TcpListener listener = new(td.Ip, td.Port);
             listener.Start();
 
-            while (this._isActive)
+            while (state.IsActive)
             {
-                while (!this._running && this._isActive) { Thread.Sleep(1); }
-                while (this._running && this._isActive)
+                while (state.IsStopped) { Thread.Sleep(1); }
+                while (state.IsListening)
                 {
-                    while(!listener.Pending() && this._isActive)
+                    while(!listener.Pending() && state.IsActive)
                     {
                         Thread.Sleep(1);
                     }
-                    if (this._isActive)
+                    if (state.IsActive)
                     {
                         Socket s = listener.AcceptSocket();
-                        Thread t = new(new ParameterizedThreadStart(this.SocketThread));
+                        Thread t = new(new ParameterizedThreadStart(SocketThread));
                         t.Start(s);
                         Thread.Sleep(1);
                     }
@@ -133,15 +146,15 @@ namespace UT.Data.IO
             }
             Socket s = (Socket)data;
 
-            if(this.OnDataReceived == null)
+            if(OnDataReceived == null)
             {
                 s.Close();
                 return;
             }
 
             byte[] bIn = s.Read();
-            byte[] bOut = this.OnDataReceived.Invoke(bIn, s.RemoteEndPoint, this);
-            if(this.Logging)
+            byte[] bOut = OnDataReceived.Invoke(bIn, s.RemoteEndPoint, this);
+            if(Logging)
             {
                 FileStream fs = new("Logging/" + DateTime.Now.ToString("yyyyMMdd-HHmmss.fffffff") + ".bin", FileMode.Create, FileAccess.Write);
                 fs.Write(bIn);

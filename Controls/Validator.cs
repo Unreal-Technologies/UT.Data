@@ -5,12 +5,11 @@
         #region Members
         private readonly List<IValidatable> list = [];
         private bool isValid = false;
-        private bool isRequired = false;
         #endregion //Members
 
         #region Properties
-        public bool IsRequired { get { return this.isRequired; } set { this.isRequired = value; } }
-        public bool IsValid { get { return this.isValid; } }
+        public bool IsRequired { get; set; } = false;
+        public bool IsValid { get { return isValid; } }
         public Control? Control { get { return null; } }
         #endregion //Properties
 
@@ -18,7 +17,7 @@
         public void SetError<T>(IValidatable<T>? control, string text)
             where T: Control
         {
-            if(control == null || !this.list.Contains(control))
+            if(control == null || !list.Contains(control))
             {
                 return;
             }
@@ -28,21 +27,21 @@
         public void Add<T>(IValidatable<T>? control)
             where T: Control
         {
-            if (control != null && control is IValidatable converted)
+            if (control is IValidatable converted)
             {
-                this.list.Add(converted);
+                list.Add(converted);
             }
         }
 
         public void Validate()
         {
-            this.isValid = true;
+            isValid = true;
             foreach(IValidatable control in list)
             {
                 control.Validate();
                 if(!control.IsValid)
                 {
-                    this.isValid = false;
+                    isValid = false;
                 }
             }
         }

@@ -15,40 +15,40 @@ namespace UT.Data.Modlet
         #endregion //Members
 
         #region Properties
-        public IModlet[] Modules { get { return [.. this.modules]; } }
+        public IModlet[] Modules { get { return [.. modules]; } }
         #endregion //Properties
 
         #region Constructors
         public ModletServer(string[] ip, int port) : base(ip, port)
         {
-            this.ConstructExtension();
+            ConstructExtension();
         }
 
         public ModletServer(string[] ip, int[] ports) : base(ip, ports)
         {
-            this.ConstructExtension();
+            ConstructExtension();
         }
 
         public ModletServer(IPAddress[] ip, int port) : base(ip, port)
         {
-            this.ConstructExtension();
+            ConstructExtension();
         }
 
         public ModletServer(IPAddress[] ip, int[] ports) : base(ip, ports)
         {
-            this.ConstructExtension();
+            ConstructExtension();
         }
         #endregion //Constructors
 
         #region Public Methods
         public bool Register(IModlet module, DbContext? context)
         {
-            if(this.modules == null)
+            if(modules == null)
             {
                 return false;
             }
             module.OnServerConfiguration(context);
-            this.modules.Add(module);
+            modules.Add(module);
             return true;
         }
         #endregion //Public Methods
@@ -58,22 +58,22 @@ namespace UT.Data.Modlet
         {
             Random rnd = new((int)DateTime.Now.Ticks);
 
-            this.keys = [];
-            this.semiRand = rnd.Next(0xffff);
-            this.modules = [];
-            this.OnDataReceived += ModletServer_OnDataReceived;
+            keys = [];
+            semiRand = rnd.Next(0xffff);
+            modules = [];
+            OnDataReceived += ModletServer_OnDataReceived;
         }
 
         private byte[] ModletServer_OnDataReceived(byte[] data, EndPoint? ep, Server server)
         {
             Dataset? dsIn = Serializer<Dataset>.Deserialize(data);
-            if (dsIn == null || this.keys == null || ep == null || this.modules == null)
+            if (dsIn == null || keys == null || ep == null || modules == null)
             {
                 return [];
             }
             string lockKey = ep.ToString()?.Split(':')[0] ?? string.Empty;
 
-            Dataset dsOut;
+            Dataset? dsOut = null;
             switch (dsIn.Command)
             {
                 case ModletCommands.Commands.Connect:
@@ -94,8 +94,8 @@ namespace UT.Data.Modlet
                     }
                     else
                     {
-                        string unique = Hashing.Guid(ep.ToString() + "/" + computer + "/" + this.semiRand).ToString();
-                        this.keys.Add(lockKey, unique);
+                        string unique = Hashing.Guid(ep.ToString() + "/" + computer + "/" + semiRand).ToString();
+                        keys.Add(lockKey, unique);
                         key = unique;
                         ExtendedConsole.WriteLine(string.Format("Registered key <yellow>{0}</yellow> for <cyan>{1}</cyan>", unique, lockKey));
                     }
@@ -110,7 +110,7 @@ namespace UT.Data.Modlet
                         return [];
                     }
 
-                    string aeskey = this.keys[lockKey];
+                    string aeskey = keys[lockKey];
                     if(stream != null)
                     {
                         stream = Aes.Decrypt(stream, aeskey);
@@ -124,14 +124,14 @@ namespace UT.Data.Modlet
 
                     if(type == null)
                     {
-                        foreach(IModlet m in this.modules)
+                        foreach(IModlet m in modules)
                         {
                             m.OnGlobalServerAction(stream, ip);
                         }
                     }
                     else
                     {
-                        IModlet? m = this.modules.Where(x => x.GetType().AssemblyQualifiedName == type.AssemblyQualifiedName).FirstOrDefault();
+                        IModlet? m = modules.Find(x => x.GetType().AssemblyQualifiedName == type.AssemblyQualifiedName);
                         if(m != null)
                         {
                             output = m.OnLocalServerAction(stream, ip);
@@ -148,10 +148,6 @@ namespace UT.Data.Modlet
                     throw new NotImplementedException();
             }
 
-            if(dsOut == null)
-            {
-                return [];
-            }
             return Serializer<Dataset>.Serialize(dsOut);
         }
         #endregion //Prviate Methods

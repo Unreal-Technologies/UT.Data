@@ -1,7 +1,5 @@
-using System.Diagnostics;
-using System.Text;
 using System.ComponentModel;
-using System.Web;
+using System.Text;
 
 namespace UT.Data.Controls.Custom
 {
@@ -10,7 +8,6 @@ namespace UT.Data.Controls.Custom
         #region Members
         private readonly IContainer? components = null;
         private readonly Dropdown dropdown;
-        private string valueSeparator;
         #endregion //Members
 
         #region Events
@@ -21,7 +18,7 @@ namespace UT.Data.Controls.Custom
         public CheckedComboBox() : base()
         {
             DrawMode = DrawMode.OwnerDrawVariable;
-            valueSeparator = ", ";
+            ValueSeparator = ", ";
             DropDownHeight = 1;
             DropDownStyle = ComboBoxStyle.DropDown;
             dropdown = new Dropdown(this);
@@ -30,11 +27,7 @@ namespace UT.Data.Controls.Custom
         #endregion //Constructors
 
         #region Properties
-        public string ValueSeparator
-        {
-            get { return valueSeparator; }
-            set { valueSeparator = value; }
-        }
+        public string ValueSeparator { get; set; }
 
         public bool CheckOnClick
         {
@@ -151,7 +144,7 @@ namespace UT.Data.Controls.Custom
             {
                 OnDropDown(EventArgs.Empty);
             }
-            e.Handled = !e.Alt && !(e.KeyCode == Keys.Tab) && !(e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Home || e.KeyCode == Keys.End);
+            e.Handled = !e.Alt && (e.KeyCode != Keys.Tab) && !(e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Home || e.KeyCode == Keys.End);
 
             base.OnKeyDown(e);
         }
@@ -173,11 +166,9 @@ namespace UT.Data.Controls.Custom
                 {
                     count = 1;
                 }
-                if (dropdown != null)
-                {
-                    dropdown.Size = new Size(Size.Width, (dropdown.List?.ItemHeight ?? 0) * count + 2);
-                    dropdown.Show(this);
-                }
+
+                dropdown.Size = new Size(Size.Width, (dropdown.List?.ItemHeight ?? 0) * count + 2);
+                dropdown.Show(this);
             }
         }
 
@@ -196,7 +187,6 @@ namespace UT.Data.Controls.Custom
             private string oldStrValue = "";
             private bool[] checkedStateArr;
             private bool dropdownClosed = true;
-            private CustomCheckedListBox? cclb;
             #endregion //Members
 
             #region Properties
@@ -216,11 +206,7 @@ namespace UT.Data.Controls.Custom
                 }
             }
 
-            public CustomCheckedListBox? List
-            {
-                get { return cclb; }
-                set { cclb = value; }
-            }
+            public CustomCheckedListBox? List { get; set; }
             #endregion //Properties
 
             #region Constructors
@@ -230,9 +216,9 @@ namespace UT.Data.Controls.Custom
                 checkedStateArr = [];
                 InitializeComponent();
                 ShowInTaskbar = false;
-                if (cclb != null)
+                if (List != null)
                 {
-                    cclb.ItemCheck += new ItemCheckEventHandler(Cclb_ItemCheck);
+                    List.ItemCheck += new ItemCheckEventHandler(Cclb_ItemCheck);
                 }
             }
             #endregion //Constructors
@@ -241,11 +227,11 @@ namespace UT.Data.Controls.Custom
             public string GetCheckedItemsStringValue()
             {
                 StringBuilder sb = new("");
-                if (cclb != null)
+                if (List != null)
                 {
-                    for (int i = 0; i < cclb.CheckedItems.Count; i++)
+                    for (int i = 0; i < List.CheckedItems.Count; i++)
                     {
-                        sb.Append(cclb.GetItemText(cclb.CheckedItems[i])).Append(ccbParent.ValueSeparator);
+                        sb.Append(List.GetItemText(List.CheckedItems[i])).Append(ccbParent.ValueSeparator);
                     }
                 }
                 if (sb.Length > 0)
@@ -266,11 +252,11 @@ namespace UT.Data.Controls.Custom
                     ccbParent.SelectedIndex = -1;
                     ccbParent.Text = GetCheckedItemsStringValue();
                 }
-                else if (cclb != null)
+                else if (List != null)
                 {
-                    for (int i = 0; i < cclb.Items.Count; i++)
+                    for (int i = 0; i < List.Items.Count; i++)
                     {
-                        cclb.SetItemChecked(i, checkedStateArr[i]);
+                        List.SetItemChecked(i, checkedStateArr[i]);
                     }
                 }
                 dropdownClosed = true;
@@ -283,18 +269,18 @@ namespace UT.Data.Controls.Custom
             #region Private Methods
             private void InitializeComponent()
             {
-                cclb = new CustomCheckedListBox();
+                List = new CustomCheckedListBox();
                 SuspendLayout();
                 // 
                 // cclb
                 // 
-                cclb.BorderStyle = BorderStyle.None;
-                cclb.Dock = DockStyle.Fill;
-                cclb.FormattingEnabled = true;
-                cclb.Location = new Point(0, 0);
-                cclb.Name = "cclb";
-                cclb.Size = new Size(47, 15);
-                cclb.TabIndex = 0;
+                List.BorderStyle = BorderStyle.None;
+                List.Dock = DockStyle.Fill;
+                List.FormattingEnabled = true;
+                List.Location = new Point(0, 0);
+                List.Name = "cclb";
+                List.Size = new Size(47, 15);
+                List.TabIndex = 0;
                 // 
                 // Dropdown
                 // 
@@ -303,7 +289,7 @@ namespace UT.Data.Controls.Custom
                 BackColor = SystemColors.Menu;
                 ClientSize = new Size(47, 16);
                 ControlBox = false;
-                Controls.Add(cclb);
+                Controls.Add(List);
                 ForeColor = SystemColors.ControlText;
                 FormBorderStyle = FormBorderStyle.FixedToolWindow;
                 MinimizeBox = false;
@@ -327,12 +313,12 @@ namespace UT.Data.Controls.Custom
                 base.OnActivated(e);
                 dropdownClosed = false;
                 oldStrValue = ccbParent.Text;
-                if (cclb != null)
+                if (List != null)
                 {
-                    checkedStateArr = new bool[cclb.Items.Count];
-                    for (int i = 0; i < cclb.Items.Count; i++)
+                    checkedStateArr = new bool[List.Items.Count];
+                    for (int i = 0; i < List.Items.Count; i++)
                     {
-                        checkedStateArr[i] = cclb.GetItemChecked(i);
+                        checkedStateArr[i] = List.GetItemChecked(i);
                     }
                 }
             }
@@ -356,22 +342,12 @@ namespace UT.Data.Controls.Custom
             internal class CCBoxEventArgs(EventArgs? e, bool assignValues) : EventArgs()
             {
                 #region Members
-                private bool assignValues = assignValues;
-                private EventArgs? e = e;
                 #endregion //Members
 
                 #region Properties
-                public bool AssignValues
-                {
-                    get { return assignValues; }
-                    set { assignValues = value; }
-                }
+                public bool AssignValues { get; set; } = assignValues;
 
-                public EventArgs? EventArgs
-                {
-                    get { return e; }
-                    set { e = value; }
-                }
+                public EventArgs? EventArgs { get; set; } = e;
                 #endregion //Properties
             }
 

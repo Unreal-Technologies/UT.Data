@@ -3,7 +3,7 @@ using System.Text;
 
 namespace UT.Data
 {
-    public class Hashing
+    public static class Hashing
     {
         public static Guid Guid(string input)
         {

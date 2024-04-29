@@ -225,8 +225,8 @@
             int maxY = fields.Select(x => x.Item1.Y).Max();
             int maxX = fields.Select(x => x.Item1.X).Max();
 
-            Dictionary<int, int> columns = [];
-            Dictionary<int, int> rows = [];
+            Dictionary<int, int> columnsBuffer = [];
+            Dictionary<int, int> rowsBuffer = [];
 
             for (int y = 0; y <= maxY; y++)
             {
@@ -242,28 +242,28 @@
                         size = control.Size;
                     }
 
-                    if (columns.TryGetValue(x, out int valueX))
+                    if (columnsBuffer.TryGetValue(x, out int valueX))
                     {
-                        columns[x] = Math.Max(valueX, size.Width);
+                        columnsBuffer[x] = Math.Max(valueX, size.Width);
                     }
                     else
                     {
-                        columns.Add(x, size.Width);
+                        columnsBuffer.Add(x, size.Width);
                     }
 
-                    if (rows.TryGetValue(y, out int valueY))
+                    if (rowsBuffer.TryGetValue(y, out int valueY))
                     {
-                        rows[y] = Math.Max(valueY, size.Height);
+                        rowsBuffer[y] = Math.Max(valueY, size.Height);
                     }
                     else
                     {
-                        rows.Add(y, size.Height);
+                        rowsBuffer.Add(y, size.Height);
                     }
                 }
             }
 
-            columnSizes = columns;
-            rowSizes = rows;
+            columnSizes = columnsBuffer;
+            rowSizes = rowsBuffer;
 
             PositionControls();
         }
@@ -271,11 +271,11 @@
         private void PositionControls()
         {
             int padding = Gridview<Tid>.Padding;
-            Dictionary<int, int> rows = rowSizes;
-            Dictionary<int, int> columns = columnSizes;
+            Dictionary<int, int> rowsBuffer = rowSizes;
+            Dictionary<int, int> columnsBuffer = columnSizes;
 
-            int maxY = rows.Keys.Max();
-            int maxX = columns.Keys.Max();
+            int maxY = rowsBuffer.Keys.Max();
+            int maxX = columnsBuffer.Keys.Max();
 
             int offsetY = padding;
             for (int y = 0; y <= maxY; y++)
@@ -284,7 +284,7 @@
                 for (int x = 0; x <= maxX; x++)
                 {
                     Point index = new(x, y);
-                    Size size = new(columns[x], rows[y]);
+                    Size size = new(columnsBuffer[x], rowsBuffer[y]);
 
                     Tuple<Control?, Alignment>? data = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment>(x.Item2, x.Item3)).FirstOrDefault();
                     if (data == null)
@@ -314,7 +314,7 @@
                     }
                     offsetX += size.Width + padding;
                 }
-                offsetY += rows.Values.Max() + padding;
+                offsetY += rowsBuffer.Values.Max() + padding;
             }
             Size = PreferredSize;
         }

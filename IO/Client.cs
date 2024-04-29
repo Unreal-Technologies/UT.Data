@@ -21,13 +21,13 @@ namespace UT.Data.IO
         internal T? Send<T>(T obj)
             where T : class
         {
-            return Serializer<T>.Deserialize(this.Send(Serializer<T>.Serialize(obj)));
+            return Serializer<T>.Deserialize(Send(Serializer<T>.Serialize(obj)));
         }
 
         internal byte[] Send(byte[] data)
         {
             TcpClient client = new();
-            client.Connect(this.ip, this.port);
+            client.Connect(ip, port);
             Stream stream = client.GetStream();
 
             stream.Write(data, 0, data.Length);

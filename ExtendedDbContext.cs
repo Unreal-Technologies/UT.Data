@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace UT.Data
 {
@@ -14,8 +13,8 @@ namespace UT.Data
             #endregion //Members
 
             #region Properties
-            public string ConnectionString { get { return this.connectionString; } }
-            public Types Type { get { return this.type; } }
+            public string ConnectionString { get { return connectionString; } }
+            public Types Type { get { return type; } }
             #endregion //Properties
         }
         #endregion //Classes
@@ -29,37 +28,18 @@ namespace UT.Data
 
         #region Members
         private readonly Configuration configuration = configuration;
-
         #endregion //Members
 
         #region Overrides
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            switch (this.configuration.Type)
+            switch (configuration.Type)
             {
                 case Types.Mysql:
-                    optionsBuilder.UseMySQL(this.configuration.ConnectionString);
+                    optionsBuilder.UseMySQL(configuration.ConnectionString);
                     break;
             }
         }
         #endregion //Overrides
-
-        #region Public Methods
-        public static Configuration? CreateConnection(Types type, IPAddress ip, int port, string username, string? password, string db)
-        {
-            return type switch
-            {
-                Types.Mysql => ExtendedDbContext.CreateMysqlConnection(ip, port, username, password, db),
-                _ => null,
-            };
-        }
-
-        public static Configuration CreateMysqlConnection(IPAddress ip, int port, string username, string? password, string db)
-        {
-            string connection = "server={0};port={1};database={2};user={3};password={4};";
-
-            return new Configuration(string.Format(connection, ip, port, db, username, password), Types.Mysql);
-        }
-        #endregion //Public Methods
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace UT.Data
 {
-    public class Network
+    public static class Network
     {
         #region Public Methods
         public static bool IsServerReachable(IPAddress ip, int port)
@@ -37,13 +38,9 @@ namespace UT.Data
             {
                 if (item.NetworkInterfaceType == nit && item.OperationalStatus == OperationalStatus.Up)
                 {
-                    foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
-                    {
-                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            buffer.Add(ip.Address);
-                        }
-                    }
+                    buffer.AddRange(from UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses
+                                    where ip.Address.AddressFamily == AddressFamily.InterNetwork
+                                    select ip.Address);
                 }
             }
             return [.. buffer];

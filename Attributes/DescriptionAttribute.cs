@@ -8,7 +8,7 @@
         #endregion //Members
 
         #region Properties
-        public string Text { get { return this._text; } }
+        public string Text { get { return _text; } }
 
         #endregion //Properties
     }

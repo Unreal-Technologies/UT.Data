@@ -18,12 +18,12 @@ namespace UT.Data.Modlet
 
         public Dataset(ModletCommands.Commands command, byte[]? data, IModlet? module)
         {
-            this.Command = command;
-            this.Data = data;
+            Command = command;
+            Data = data;
             if (module != null)
             {
                 string? type = module.GetType().AssemblyQualifiedName;
-                this.Module = type == null ? null : ASCIIEncoding.UTF8.GetBytes(type);
+                Module = type == null ? null : ASCIIEncoding.UTF8.GetBytes(type);
             }
         }
         #endregion //Constructors

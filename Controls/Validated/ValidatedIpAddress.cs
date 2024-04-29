@@ -11,7 +11,7 @@ namespace UT.Data.Controls.Validated
             return tb.Text;
         })
         {
-            this.AddValidation(delegate (TextBox tb)
+            AddValidation(delegate (TextBox tb)
             {
                 if (!IpRegex().Match(tb.Text).Success)
                 {

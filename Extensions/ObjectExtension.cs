@@ -5,7 +5,7 @@
         #region Public Methods
         public static T? GetAttribute<T>(this object value)
         {
-            return (T?)value.GetType().GetCustomAttributes(true).Where(x => x.GetType() == typeof(T)).FirstOrDefault();
+            return (T?)value.GetType().GetCustomAttributes(true).FirstOrDefault(x => x.GetType() == typeof(T));
         }
         #endregion //Public Methods
     }

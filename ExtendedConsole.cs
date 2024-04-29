@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
 using UT.Data.Extensions;
+using System.Linq;
 
 namespace UT.Data
 {
@@ -67,19 +68,12 @@ namespace UT.Data
             }
 
             List<ConsoleColor> colors = [];
-            foreach(Match match in StartTagMatchRegex().Matches(text).Cast<Match>())
-            {
-                string txtMatch = match.Value;
-                string txtColor = txtMatch[1..(txtMatch.Length - 1)];
-                foreach(ConsoleColor color in ExtendedConsole.Colors())
-                {
-                    if(color.ToString().Equals(txtColor, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        colors.Add(color);
-                    }
-                }
-            }
-
+            colors.AddRange(from Match match in StartTagMatchRegex().Matches(text).Cast<Match>()
+                            let txtMatch = match.Value
+                            let txtColor = txtMatch[1..(txtMatch.Length - 1)]
+                            from ConsoleColor color in ExtendedConsole.Colors()
+                            where color.ToString().Equals(txtColor, StringComparison.CurrentCultureIgnoreCase)
+                            select color);
             string txtBuffer = text;
             string lcBuffer = txtBuffer.ToLower();
             List<Tuple<string, ConsoleColor>> buffer = [];

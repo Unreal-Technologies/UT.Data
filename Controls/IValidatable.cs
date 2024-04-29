@@ -14,7 +14,7 @@
         #endregion //Public Methods
     }
 
-    public interface IValidatable<T> : IValidatable
+    public interface IValidatable<out T> : IValidatable
         where T : Control
     {
         public new T Control { get; }
