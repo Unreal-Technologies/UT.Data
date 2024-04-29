@@ -5,7 +5,7 @@ using UT.Data.Structure;
 
 namespace UT.Data.IO.Assemblies
 {
-    public class Loader
+    public static class Loader
     {
         #region Public Methods
         public static T[] GetInstances<T>(bool byRequirements = true)
@@ -21,7 +21,7 @@ namespace UT.Data.IO.Assemblies
                 {
                     if (!type.IsInterface && !type.IsAbstract && isInterface)
                     {
-                        Type? modlet = type.GetInterfaces().Where(x => x == typeof(T)).FirstOrDefault();
+                        Type? modlet = Array.Find(type.GetInterfaces(), x => x == typeof(T));
                         if (modlet != null)
                         {
                             T? instance = (T?)Activator.CreateInstance(type);
@@ -64,19 +64,19 @@ namespace UT.Data.IO.Assemblies
             Assembly? selfAssem = Assembly.GetAssembly(typeof(T)) ?? throw new NotImplementedException();
             FileInfo file = new(selfAssem.Location);
             DirectoryInfo? root = file.Directory ?? throw new NotImplementedException();
-            foreach (FileInfo fi in root.EnumerateFiles("*.dll"))
+            foreach (string fullName in root.EnumerateFiles("*.dll").Select(x => x.FullName))
             {
-                if (fi.FullName == file.FullName)
+                if (fullName == file.FullName)
                 {
                     continue;
                 }
-                Assembly? match = assemblies.Where(x => x.Location == fi.FullName).FirstOrDefault();
+                Assembly? match = assemblies.Find(x => x.Location == fullName);
                 if (match != null)
                 {
                     continue;
                 }
 
-                Assembly assem = Assembly.LoadFrom(fi.FullName);
+                Assembly assem = Assembly.LoadFrom(fullName);
                 assemblies.Add(assem);
             }
 
@@ -97,7 +97,7 @@ namespace UT.Data.IO.Assemblies
                     List<int> pBuffer = [];
                     foreach(Type t in Loader.GetValidTypes<T>(position.Requires))
                     {
-                        T? parent = list.Where(x => x.GetType() == t).FirstOrDefault();
+                        T? parent = Array.Find(list, x => x.GetType() == t);
                         if(parent != null)
                         {
                             int pIdx = Array.IndexOf(list, parent);
@@ -149,7 +149,7 @@ namespace UT.Data.IO.Assemblies
             List<Type> buffer = [];
             foreach(Type t in list)
             {
-                if(t.GetInterfaces().Where(x => x == typeof(T)).FirstOrDefault() != null)
+                if(Array.Find(t.GetInterfaces(), x => x == typeof(T)) != null)
                 {
                     buffer.Add(t);
                 }

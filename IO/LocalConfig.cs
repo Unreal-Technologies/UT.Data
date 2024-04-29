@@ -6,6 +6,8 @@ namespace UT.Data.IO
 {
     public class LocalConfig
     {
+        private readonly char DSC = System.IO.Path.DirectorySeparatorChar;
+
         #region Members
         private FileInfo location;
         #endregion //Members
@@ -19,7 +21,7 @@ namespace UT.Data.IO
         {
             Assembly assem = Assembly.GetCallingAssembly();
             DirectoryInfo? dir = (new FileInfo(assem.Location)).Directory ?? throw new NotImplementedException("No Codebase");
-            location = new FileInfo(dir.FullName + "\\" + name + ".lc");
+            location = new FileInfo(dir.FullName + DSC + name + ".lc");
         }
         #endregion //Constructors
 

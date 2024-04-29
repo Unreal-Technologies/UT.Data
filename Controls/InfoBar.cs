@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace UT.Data.Controls
+﻿namespace UT.Data.Controls
 {
     public class InfoBar : Panel
     {

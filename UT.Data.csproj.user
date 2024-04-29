@@ -11,6 +11,9 @@
     <Compile Update="Controls\Custom\GridviewGuid.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="Controls\GdiText.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="Controls\Logo.cs">
       <SubType>Component</SubType>
     </Compile>

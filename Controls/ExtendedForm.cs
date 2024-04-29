@@ -6,6 +6,7 @@
         public ExtendedForm() : base()
         {
             Icon = Resources.Favicon;
+            Font = new Font(FontFamily.GenericMonospace, 9);
 
             InitializeComponent();
 
