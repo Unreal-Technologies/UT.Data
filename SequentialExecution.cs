@@ -7,10 +7,11 @@
         private int position = 0;
         private readonly Form? parent = parent;
         private bool active = true;
+        private readonly ManualResetEvent resetEvent = new(true);
         #endregion //Members
 
         #region Delegates
-        public delegate bool Task(SequentialExecution self);
+        public delegate bool Task(SequentialExecution self, ManualResetEvent resetEvent);
         public delegate void OnOutput(string text, bool isValid);
         #endregion //Delegates
 
@@ -56,6 +57,16 @@
             }
         }
 
+        public void Pause()
+        {
+            resetEvent.Reset();
+        }
+
+        public void Unpause()
+        {
+            resetEvent.Set();
+        }
+
         public void Start()
         {
             IsValid = true;
@@ -87,10 +98,11 @@
             bool state = true;
             while(position < tasks.Count && active)
             {
+                resetEvent.WaitOne();
                 Tuple<Task, string> data = tasks[position];
                 Task task = data.Item1;
                 SetOutput(null);
-                bool result = task(this);
+                bool result = task(this, resetEvent);
                 if(!result)
                 {
                     state = false;

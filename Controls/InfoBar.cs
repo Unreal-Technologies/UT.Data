@@ -75,7 +75,7 @@
 
         private void PictureBox_MouseEnter(object? sender, EventArgs e)
         {
-            if(sender is PictureBox pb)
+            if (sender is PictureBox pb)
             {
                 pb.BackColor = Color.YellowGreen;
             }
@@ -92,13 +92,13 @@
         private void InfoBar_ParentChanged(object? sender, EventArgs e)
         {
             Control? parent = Parent;
-            if(parent != null)
+            if (parent != null)
             {
-                while(parent != null && parent is not Form)
+                while (parent != null && parent is not Form)
                 {
                     parent = parent.Parent;
                 }
-                if(parent is Form form)
+                if (parent is Form form)
                 {
                     pbIcon.Image = form.Icon?.ToBitmap();
                 }
