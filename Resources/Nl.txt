@@ -1,4 +1,0 @@
-S!InputError:Invoer Fout
-S!RequiredField:Dit is een verplicht veld.
-W!Task:Taak
-S!RegisteredKey:Registratie sleutel: <yellow>{0}</yellow> voor <cyan>{1}</cyan>

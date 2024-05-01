@@ -31,8 +31,8 @@ namespace UT.Data.Modlet
 
         internal Packet(TDescription description, TData data)
         {
-            this.Description = description;
-            this.Data = data;
+            Description = description;
+            Data = data;
         }
         #endregion //Constructors
     }

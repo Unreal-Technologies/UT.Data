@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace UT.Data.IO
 {
-    public class Serializer<T>
+    public static class Serializer<T>
         where T : class
     {
         #region Public Methods

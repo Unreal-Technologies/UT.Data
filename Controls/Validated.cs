@@ -5,6 +5,10 @@ namespace UT.Data.Controls
     public class Validated<T> : Panel, IValidatable<T>
         where T: Control
     {
+        #region Constants
+        private const int InterControlPadding = 3;
+        #endregion //Constants
+
         #region Members
         [AllowNull]
         private readonly T control;
@@ -16,10 +20,10 @@ namespace UT.Data.Controls
         #endregion //Members
 
         #region Properties
-        public T Control { get { return this.control; } }
-        public bool IsRequired { get { return this.isRequired; } set { this.isRequired = value; this.SetSymbol(); } }
-        public bool IsValid { get { return this.isValid; } }
-        Control IValidatable.Control { get { return this.control; } }
+        public T Control { get { return control; } }
+        public bool IsRequired { get { return isRequired; } set { isRequired = value; symbol.Visible = value; } }
+        public bool IsValid { get { return isValid; } }
+        Control IValidatable.Control { get { return control; } }
         #endregion //Properties
 
         #region Delegates
@@ -28,71 +32,80 @@ namespace UT.Data.Controls
         #endregion //Delegates
 
         #region Events
+#pragma warning disable S3264 // Events should be invoked, is invoked see Validate method
         private event ExtraValidationHandler? ExtraValidation;
+#pragma warning restore S3264 // Events should be invoked, is invoked see Validate method
         #endregion //Events
 
         #region Constructors
         public Validated(ValueHandler handler)
         {
-            this.valueHandler = handler;
+            valueHandler = handler;
             T? temp = (T?)Activator.CreateInstance(typeof(T));
             if(temp != null)
             {
-                temp.SizeChanged += Temp_SizeChanged;
-                this.control = temp;
+                temp.Size = temp.PreferredSize;
+                temp.Dock = DockStyle.Left;
+                control = temp;
             }
-            this.defaultBackColor = this.control?.BackColor ?? this.BackColor;
-            this.symbol = new()
+            defaultBackColor = control?.BackColor ?? BackColor;
+            symbol = new()
             {
                 Text = "*",
-                Font = new Font(this.Font.FontFamily, 11, FontStyle.Bold),
+                Font = new Font(Font.FontFamily, 10, FontStyle.Bold),
                 ForeColor = Color.DarkRed,
-                Location = new Point(this.Location.X + this.Width + 1, this.Location.Y)
+                Visible = false,
+                Dock = DockStyle.Right
             };
 
-            this.Controls.Add(this.control);
+            Controls.Add(control);
+            Controls.Add(symbol);
+
+            symbol.Size = symbol.PreferredSize;
+            if(control == null)
+            {
+                return;
+            }
+            SizeChanged += Validated_SizeChanged;
         }
+
         #endregion //Constructors
 
         #region Public Methods
         public void AddValidation(ExtraValidationHandler validation)
         {
-            this.ExtraValidation += validation;
+            ExtraValidation += validation;
         }
 
         public void Validate()
         {
-            this.isValid = true;
-            T control = this.control;
-            string? text = this.valueHandler(control);
+            isValid = true;
+            string? text = valueHandler(control);
 
-            this.ClearError();
-            if ((text == null || text == string.Empty) && this.isRequired)
+            ClearError();
+            if ((text == null || text == string.Empty) && isRequired)
             {
-                this.SetError(Strings.String_RequiredField);
-                this.isValid = false;
+                SetErrorInternal("This field is required");
+                isValid = false;
                 return;
             }
 
-            if (text != null && this.ExtraValidation != null && this.isValid)
+            if (text != null && ExtraValidation != null && isValid)
             {
                 List<string> buffer = [];
-                foreach (Delegate delegateItem in this.ExtraValidation.GetInvocationList())
+                foreach (Delegate delegateItem in ExtraValidation.GetInvocationList())
                 {
                     ExtraValidationHandler? handler = delegateItem as ExtraValidationHandler;
                     Tuple<bool, string>? output = handler?.Invoke(control);
-                    if(output != null)
+                    if (output != null && !output.Item1)
                     {
-                        if(!output.Item1)
-                        {
-                            buffer.Add(output.Item2);
-                            this.isValid = false;
-                        }
+                        buffer.Add(output.Item2);
+                        isValid = false;
                     }
                 }
-                if (!this.isValid)
+                if (!isValid)
                 {
-                    this.SetError(string.Join("\r\n", buffer));
+                    SetErrorInternal(string.Join("\r\n", buffer));
                 }
             }
         }
@@ -101,15 +114,21 @@ namespace UT.Data.Controls
         #region Private Methods
         private void ClearError()
         {
-            this.SetError(null);
+            SetErrorInternal(null);
         }
 
-        private void SetError(string? text = null)
+        public void SetError(string text)
+        {
+            isValid = false;
+            SetErrorInternal(text);
+        }
+
+        private void SetErrorInternal(string? text = null)
         {
             ToolTip tooltip = new()
             {
                 ShowAlways = true,
-                ToolTipTitle = Strings.String_InputError,
+                ToolTipTitle = "Input Error",
                 ToolTipIcon = ToolTipIcon.Error,
                 IsBalloon = true,
                 InitialDelay = 1,
@@ -121,35 +140,20 @@ namespace UT.Data.Controls
             bool isError = text != null;
             if (isError)
             {
-                tooltip.SetToolTip(this.control, text);
-                tooltip.Show(text, this.control, this.control.Width, 0, 3000);
-                this.control.BackColor = Color.Red;
+                tooltip.SetToolTip(control, text);
+                tooltip.Show(text, control, control.Width, 0, 3000);
+                control.BackColor = Color.Red;
             }
             else
             {
-                this.control.BackColor = this.defaultBackColor;
+                control.BackColor = defaultBackColor;
             }
         }
 
-        private void Temp_SizeChanged(object? sender, EventArgs e)
+        private void Validated_SizeChanged(object? sender, EventArgs e)
         {
-            this.symbol.Location = new Point(this.control.Location.X + this.control.Width + 1, this.control.Location.Y);
-            this.Size = this.PreferredSize;
-        }
-
-        private void SetSymbol()
-        {
-            if (this.isRequired && this.symbol != null)
-            {
-                this.Controls.Add(this.symbol);
-                this.symbol.Size = this.symbol.PreferredSize;
-            }
-            else if (this.symbol != null)
-            {
-                this.symbol.Location = new Point(this.Location.X + this.Width + 1, this.Location.Y);
-                this.Controls.Remove(this.symbol);
-            }
-            this.Size = this.PreferredSize;
+            int width = Width;
+            control.Width = width - symbol.Width - Validated<T>.InterControlPadding;
         }
         #endregion //Private Methods
     }

@@ -1,5 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Drawing;
+using System.Text.RegularExpressions;
 using UT.Data.Extensions;
+using System.Linq;
 
 namespace UT.Data
 {
@@ -9,6 +11,13 @@ namespace UT.Data
         private static bool boxingMode;
         private static int boxingSize;
         #endregion //Statics
+
+        #region Enums
+        public enum Alignment
+        {
+            Left, Right, Center
+        }
+        #endregion //Enums
 
         #region Public Methods
         public static void BoxMode(bool enabled, int? length=null)
@@ -30,6 +39,23 @@ namespace UT.Data
             }
         }
 
+        public static void WriteLine(string text, Alignment alignment)
+        {
+            if(alignment == Alignment.Left)
+            {
+                ExtendedConsole.WriteLine(text);
+            }
+
+            string shortened = ExtendedConsoleTagReplacementRegex().Replace(text, "");
+            int padding = ExtendedConsole.boxingSize - shortened.Length;
+            if(alignment == Alignment.Center)
+            {
+                padding /= 2;
+            }
+
+            ExtendedConsole.WriteLine(" ".Repeat(padding) + text);
+        }
+
         public static void WriteLine(string text)
         {
             ConsoleColor baseColor = Console.ForegroundColor;
@@ -42,19 +68,12 @@ namespace UT.Data
             }
 
             List<ConsoleColor> colors = [];
-            foreach(Match match in StartTagMatchRegex().Matches(text).Cast<Match>())
-            {
-                string txtMatch = match.Value;
-                string txtColor = txtMatch[1..(txtMatch.Length - 1)];
-                foreach(ConsoleColor color in ExtendedConsole.Colors())
-                {
-                    if(color.ToString().Equals(txtColor, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        colors.Add(color);
-                    }
-                }
-            }
-
+            colors.AddRange(from Match match in StartTagMatchRegex().Matches(text).Cast<Match>()
+                            let txtMatch = match.Value
+                            let txtColor = txtMatch[1..(txtMatch.Length - 1)]
+                            from ConsoleColor color in ExtendedConsole.Colors()
+                            where color.ToString().Equals(txtColor, StringComparison.CurrentCultureIgnoreCase)
+                            select color);
             string txtBuffer = text;
             string lcBuffer = txtBuffer.ToLower();
             List<Tuple<string, ConsoleColor>> buffer = [];
@@ -129,6 +148,8 @@ namespace UT.Data
 
         [GeneratedRegex(@"\<\/[a-z]+\>", RegexOptions.IgnoreCase)]
         private static partial Regex EndTagMatchRegex();
+        [GeneratedRegex(@"<\/?[a-z]+>", RegexOptions.IgnoreCase, "en-NL")]
+        private static partial Regex ExtendedConsoleTagReplacementRegex();
         #endregion //Private Methods
     }
 }

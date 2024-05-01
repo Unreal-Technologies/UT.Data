@@ -18,12 +18,12 @@
         #region Properties
         public string Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         public string Value
         {
-            get { return this.value; }
+            get { return value; }
         }
 
         #endregion //Properties

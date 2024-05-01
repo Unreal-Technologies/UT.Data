@@ -11,31 +11,31 @@
         #region Properties
         public T Ordinal
         {
-            get { return this.ordinal; }
+            get { return ordinal; }
         }
 
         public Branch<T>[] Branches
         {
-            get { return this.branches.ToArray(); }
+            get { return [.. branches]; }
         }
         #endregion //Properties
 
         #region Constructors
         protected Branch(T i)
         {
-            this.ordinal = i;
-            this.branches = new List<Branch<T>>();
+            ordinal = i;
+            branches = [];
         }
         #endregion //Constructors
 
         #region Public Methods
         public void AddBranches(Dictionary<T, T[]> data)
         {
-            T[] branches = data.Where(x => Array.IndexOf(x.Value, this.ordinal) != -1).Select(x => x.Key).Distinct().ToArray();
-            foreach (T branch in branches)
+            T[] branchList = data.Where(x => Array.IndexOf(x.Value, ordinal) != -1).Select(x => x.Key).Distinct().ToArray();
+            foreach (T branch in branchList)
             {
                 Branch<T> b = new(branch);
-                if (!this.branches.Contains(b) && this.branches.Where(x => x.ordinal.Equals(this.ordinal)).FirstOrDefault() == null)
+                if (!this.branches.Contains(b) && this.branches.Find(x => x.ordinal.Equals(ordinal)) == null)
                 {
                     b.AddBranches(data);
                     this.branches.Add(b);

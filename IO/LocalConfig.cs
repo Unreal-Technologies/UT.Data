@@ -6,6 +6,8 @@ namespace UT.Data.IO
 {
     public class LocalConfig
     {
+        private readonly char DSC = System.IO.Path.DirectorySeparatorChar;
+
         #region Members
         private FileInfo location;
         #endregion //Members
@@ -19,14 +21,19 @@ namespace UT.Data.IO
         {
             Assembly assem = Assembly.GetCallingAssembly();
             DirectoryInfo? dir = (new FileInfo(assem.Location)).Directory ?? throw new NotImplementedException("No Codebase");
-            this.location = new FileInfo(dir.FullName + "\\" + name + ".lc");
+            location = new FileInfo(dir.FullName + DSC + name + ".lc");
         }
         #endregion //Constructors
 
         #region Properties
+        public string Path
+        {
+            get { return location.Name; }
+        }
+
         public bool Exists
         {
-            get { return this.location.Exists; }
+            get { return location.Exists; }
         }
         #endregion //Properties
 
@@ -38,12 +45,12 @@ namespace UT.Data.IO
 
             try
             {
-                FileStream fs = new(this.location.FullName, FileMode.Create, FileAccess.Write);
+                FileStream fs = new(location.FullName, FileMode.Create, FileAccess.Write);
                 fs.Write(stream, 0, stream.Length);
                 fs.Close();
-                while(!this.location.Exists)
+                while(!location.Exists)
                 {
-                    this.location = new FileInfo(this.location.FullName);
+                    location = new FileInfo(location.FullName);
                     Thread.Sleep(5);
                 }
                 return true;
@@ -57,7 +64,7 @@ namespace UT.Data.IO
         public T? Load<T>()
             where T : class
         {
-            FileStream fs = new(this.location.FullName, FileMode.Open, FileAccess.Read);
+            FileStream fs = new(location.FullName, FileMode.Open, FileAccess.Read);
             byte[] stream = fs.Read();
             fs.Close();
 

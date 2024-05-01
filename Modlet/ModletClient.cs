@@ -28,9 +28,9 @@ namespace UT.Data.Modlet
         #region Public Methods
         public byte[]? Send(byte[]? data, ModletCommands.Commands command, IModlet? module)
         {
-            if(data != null && this.Aes != null)
+            if(data != null && Aes != null)
             {
-                data = Encryption.Aes.Encrypt(data, this.Aes);
+                data = Encryption.Aes.Encrypt(data, Aes);
             }
             Dataset dsIn = new(command, data, module);
             Dataset? dsOut = base.Send<Dataset>(dsIn);
@@ -39,16 +39,16 @@ namespace UT.Data.Modlet
                 return null;
             }
             byte[]? output = dsOut.Data;
-            if(output != null && this.Aes != null)
+            if(output != null && Aes != null)
             {
-                output = Encryption.Aes.Decrypt(output, this.Aes);
+                output = Encryption.Aes.Decrypt(output, Aes);
             }
             return output;
         }
 
         public byte[]? Send(ModletCommands.Commands command, IModlet? module)
         {
-            return this.Send(null, command, module);
+            return Send(null, command, module);
         }
         #endregion //Public Methods
     }

@@ -3,7 +3,7 @@ using UT.Data.Extensions;
 
 namespace UT.Data.Encryption
 {
-    public class Aes
+    public static class Aes
     {
         #region Public Methods
         public static byte[] Encrypt(byte[] data, string password)
@@ -26,6 +26,19 @@ namespace UT.Data.Encryption
                 Key(password), 
                 IV(password)
             ));
+        }
+
+        public static byte[] Encrypt(byte[] text, byte[] key, byte[] iv)
+        {
+            var aes = System.Security.Cryptography.Aes.Create();
+            aes.IV = iv;
+            aes.Padding = PaddingMode.Zeros;
+            aes.Mode = CipherMode.CBC;
+            aes.KeySize = 256;
+            aes.BlockSize = 128;
+            aes.Key = Aes.FixKeyLength(key, 32);
+
+            return aes.EncryptCbc(text, iv, PaddingMode.PKCS7);
         }
 
         public static byte[]? Decrypt(byte[] value, string password)
@@ -79,19 +92,6 @@ namespace UT.Data.Encryption
             aes.Key = Aes.FixKeyLength(key, 32);
 
             return aes.DecryptCbc(text, iv, PaddingMode.PKCS7);
-        }
-
-        public static byte[] Encrypt(byte[] text, byte[] key, byte[] iv)
-        {
-            var aes = System.Security.Cryptography.Aes.Create();
-            aes.IV = iv;
-            aes.Padding = PaddingMode.Zeros;
-            aes.Mode = CipherMode.CBC;
-            aes.KeySize = 256;
-            aes.BlockSize = 128;
-            aes.Key = Aes.FixKeyLength(key, 32);
-
-            return aes.EncryptCbc(text, iv, PaddingMode.PKCS7);
         }
         #endregion //Public Methods
 

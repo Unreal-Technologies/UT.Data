@@ -11,12 +11,12 @@
         #region Properties
         public int Position
         {
-            get { return this.position; }
+            get { return position; }
         }
 
         public Type[]? Requires
         {
-            get { return this.requires; }
+            get { return requires; }
         }
         #endregion //Properties
 

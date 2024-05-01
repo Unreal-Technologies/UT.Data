@@ -71,20 +71,22 @@ namespace UT.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to S!InputError=Input Error.
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static string En {
+        internal static System.Drawing.Icon Favicon {
             get {
-                return ResourceManager.GetString("En", resourceCulture);
+                object obj = ResourceManager.GetObject("Favicon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to S!InputError=Invoer Fout.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string Nl {
+        internal static System.Drawing.Bitmap Logo {
             get {
-                return ResourceManager.GetString("Nl", resourceCulture);
+                object obj = ResourceManager.GetObject("Logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
