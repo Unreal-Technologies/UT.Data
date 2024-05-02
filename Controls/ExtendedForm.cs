@@ -1,4 +1,7 @@
-﻿namespace UT.Data.Controls
+﻿using UT.Data.Controls.Gdi;
+using UT.Data.Extensions;
+
+namespace UT.Data.Controls
 {
     public partial class ExtendedForm : Form
     {
@@ -18,6 +21,7 @@
             get { return this.title; }
             set { this.title = value; if (infoBar1 != null) { infoBar1.Text = Text; } }
         }
+
         public new string Text 
         {
             get { return Title + (Title != string.Empty && text != string.Empty ? " - " : string.Empty) + text; }
@@ -36,7 +40,19 @@
             InitializeComponent();
 
             Resize += ExtendedForm_Resize;
-            InfoBar.Close.Click += InfoBar_Close_Click;
+            if (InfoBar != null)
+            {
+                InfoBar.Close.Click += InfoBar_Close_Click;
+            }
+
+            TransparencyKey = RadialTransform.TransparencyKey;
+            this.RadialTransform(
+                25,
+                x => x.GetType() != typeof(GdiLabel) && x.GetType() != typeof(Label)
+            ).BorderTransform(
+                BorderStyle.FixedSingle,
+                Color.Gray
+            );
         }
         #endregion //Constructors
 

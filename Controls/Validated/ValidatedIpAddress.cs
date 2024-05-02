@@ -22,7 +22,7 @@ namespace UT.Data.Controls.Validated
                     return new Tuple<bool, string>(false, "Is not a valid IP address.");
                 }
 
-                return new Tuple<bool, string>(true, "NYI");
+                return new Tuple<bool, string>(true, string.Empty);
             });
         }
         #endregion //Constructors

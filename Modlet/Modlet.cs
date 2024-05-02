@@ -2,19 +2,12 @@
 
 namespace UT.Data.Modlet
 {
-    public class Modlet
+    public static class Modlet
     {
-        public static IModlet[] Load<T>(SequentialExecution? se)
+        public static IModlet[] Load<T>()
             where T : class, IModlet
         {
-            IModlet[] list = Loader.GetInstances<IModlet>().Where(x => (x as T) != null).ToArray();
-            if (se != null)
-            {
-                foreach (IModlet modlet in list)
-                {
-                    modlet.OnSequentialExecutionConfiguration(se);
-                }
-            }
+            IModlet[] list = Loader.GetInstances<IModlet>().Where(x => x is T).ToArray();
             return [.. list.Distinct()];
         }
     }

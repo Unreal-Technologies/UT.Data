@@ -5,6 +5,25 @@ namespace UT.Data.Extensions
     public static class ControlExtension
     {
         #region Public Methods
+        public static T? GetParentForm<T>(this Control control)
+            where T : Form
+        {
+            if(control.Parent == null && control is Form f)
+            {
+                return f.MdiParent as T;
+            }
+            else if(control.Parent == null)
+            {
+                return null;
+            }
+            Control? parent = control.Parent;
+            while(parent != null && parent is not T)
+            {
+                parent = parent.Parent;
+            }
+            return parent as T;
+        }
+
         public static RadialTransform RadialTransform(
             this Control control,
             SizeF topLeftRadial,

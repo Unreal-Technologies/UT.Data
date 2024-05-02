@@ -5,7 +5,6 @@ namespace UT.Data.Modlet
 {
     public interface IModlet
     {
-        public void OnSequentialExecutionConfiguration(SequentialExecution se);
         public void OnClientConfiguration(Form? form);
         public void OnGlobalServerAction(byte[]? stream, IPAddress ip);
         public byte[]? OnLocalServerAction(byte[]? stream, IPAddress ip);
