@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace UT.Data
+namespace UT.Data.Efc
 {
     public abstract class ExtendedDbContext(ExtendedDbContext.Configuration configuration) : DbContext()
     {
         #region Classes
-        public class Configuration(string connectionString, ExtendedDbContext.Types type)
+        public class Configuration(string connectionString, Types type)
         {
             #region Members
             private readonly string connectionString = connectionString;
