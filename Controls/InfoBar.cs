@@ -1,4 +1,6 @@
-﻿namespace UT.Data.Controls
+﻿using UT.Data.Extensions;
+
+namespace UT.Data.Controls
 {
     public class InfoBar : Panel
     {
@@ -46,7 +48,7 @@
             lblTitle = new Label()
             {
                 Location = new Point(50, 0),
-                Font = new Font(Font.FontFamily, 16, FontStyle.Bold),
+                Font = new Font(Font.FontFamily, 14, FontStyle.Bold),
                 ForeColor = SystemColors.Highlight
             };
 
@@ -91,17 +93,10 @@
 
         private void InfoBar_ParentChanged(object? sender, EventArgs e)
         {
-            Control? parent = Parent;
-            if (parent != null)
+            Form? parent = this.GetParentForm<Form>();
+            if(parent != null)
             {
-                while (parent != null && parent is not Form)
-                {
-                    parent = parent.Parent;
-                }
-                if (parent is Form form)
-                {
-                    pbIcon.Image = form.Icon?.ToBitmap();
-                }
+                pbIcon.Image = parent.Icon?.ToBitmap();
             }
         }
         #endregion //Private Methods

@@ -8,7 +8,7 @@ namespace UT.Data.IO.Assemblies
     public static class Loader
     {
         #region Public Methods
-        public static T[] GetInstances<T>(bool byRequirements = true)
+        public static T[] GetInstances<T>(bool byRequirements = true, params object?[]? args)
             where T : class
         {
             List<T> buffer = [];
@@ -17,7 +17,8 @@ namespace UT.Data.IO.Assemblies
 
             foreach (Assembly assembly in assemblies)
             {
-                foreach (Type type in assembly.GetExportedTypes())
+                Type[] types = assembly.GetExportedTypes();
+                foreach (Type type in types)
                 {
                     if (!type.IsInterface && !type.IsAbstract && isInterface)
                     {
@@ -34,6 +35,14 @@ namespace UT.Data.IO.Assemblies
                     else if(!type.IsInterface && !type.IsAbstract && type == typeof(T))
                     {
                         T? instance = (T?)Activator.CreateInstance(type);
+                        if (instance != null)
+                        {
+                            buffer.Add(instance);
+                        }
+                    }
+                    else if(!type.IsInterface && !type.IsAbstract && !isInterface && type.BaseType == typeof(T))
+                    {
+                        T? instance = (T?)Activator.CreateInstance(type, args);
                         if (instance != null)
                         {
                             buffer.Add(instance);
@@ -105,10 +114,6 @@ namespace UT.Data.IO.Assemblies
                         }
                     }
                     parents.Add(Array.IndexOf(list, item), [.. pBuffer]);
-                }
-                else
-                {
-                    throw new NotImplementedException();
                 }
             }
 

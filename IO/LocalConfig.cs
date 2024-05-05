@@ -26,6 +26,11 @@ namespace UT.Data.IO
         #endregion //Constructors
 
         #region Properties
+        public string FullPath
+        {
+            get { return location.FullName; }
+        }
+
         public string Path
         {
             get { return location.Name; }
