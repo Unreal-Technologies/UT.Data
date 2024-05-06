@@ -1,4 +1,4 @@
-﻿namespace Ut.Data.Helpers
+﻿namespace UT.Data.Helpers
 {
     public class AlignmentHelper
     {
