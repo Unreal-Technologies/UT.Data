@@ -4,7 +4,6 @@ using System.Reflection;
 using UT.Data.Extensions;
 using UT.Data.IO.Assemblies;
 using UT.Data.Modlet;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace UT.Data.Efc
 {
@@ -13,6 +12,10 @@ namespace UT.Data.Efc
         #region Members
         private readonly ExtendedDbContext[] contexts;
         #endregion //Members
+
+        #region Public Methods
+        public ExtendedDbContext[] List { get { return contexts; } }
+        #endregion //Public Methods
 
         #region Constructors
         public ServerContext()
