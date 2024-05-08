@@ -6,7 +6,7 @@ namespace UT.Data.Controls.Gdi
     public class RadialTransform
     {
         #region Members
-        private static Dictionary<string, PointF[]> memory = [];
+        private static readonly Dictionary<string, PointF[]> memory = [];
         private readonly SizeF topLeftRadial;
         private readonly SizeF topRightRadial;
         private readonly SizeF bottomLeftRadial;
