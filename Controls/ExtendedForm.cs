@@ -10,22 +10,38 @@ namespace UT.Data.Controls
         private string title;
         #endregion //Members
 
+        #region Events
+        public event EventHandler? TitleChanged;
+        #endregion //Events
+
         #region Properties
         public InfoBar? InfoBar 
         { 
-            get { return this.infoBar1; } 
+            get { return infoBar1; } 
         }
 
         public string Title 
         {
-            get { return this.title; }
-            set { this.title = value; if (infoBar1 != null) { infoBar1.Text = Text; } }
+            get { return title; }
+            set
+            {
+                bool isChanged = false;
+                if(title != value)
+                {
+                    isChanged = true;
+                }
+                title = value;
+                if(TitleChanged != null && isChanged)
+                {
+                    TitleChanged.Invoke(this, new EventArgs());
+                }
+            }
         }
 
         public new string Text 
         {
             get { return Title + (Title != string.Empty && text != string.Empty ? " - " : string.Empty) + text; }
-            set { text = value; if (infoBar1 != null) { infoBar1.Text = Text; } }
+            set { text = value; }
         }
         #endregion //Properties
 
@@ -40,12 +56,23 @@ namespace UT.Data.Controls
             InitializeComponent();
 
             Resize += ExtendedForm_Resize;
+            TitleChanged += ExtendedForm_TextOrTitleChanged;
+            TextChanged += ExtendedForm_TextOrTitleChanged;
+
             if (InfoBar != null)
             {
                 InfoBar.Close.Click += InfoBar_Close_Click;
             }
 
             TransparencyKey = RadialTransform.TransparencyKey;
+        }
+
+        private void ExtendedForm_TextOrTitleChanged(object? sender, EventArgs e)
+        {
+            if (infoBar1 != null) 
+            { 
+                infoBar1.Text = Text; 
+            }
         }
         #endregion //Constructors
 

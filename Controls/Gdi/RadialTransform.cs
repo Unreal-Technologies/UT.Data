@@ -28,7 +28,7 @@ namespace UT.Data.Controls.Gdi
         public PointF[]? TR { get { return topRight; } }
         public PointF[]? BL { get { return bottomLeft; } }
         public PointF[]? BR { get { return bottomRight; } }
-        public Control Control { get { return this.control; } }
+        public Control Control { get { return control; } }
         public Dictionary<Control, RadialTransform> Children { get { return children; } }
         #endregion //Properties
 

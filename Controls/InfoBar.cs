@@ -55,9 +55,9 @@ namespace UT.Data.Controls
             int h = new int[] { pbClose.Height, pbIcon.Height, lblTitle.Height }.OrderByDescending(x => x).FirstOrDefault();
             int w = new int[] { pbClose.Width, pbIcon.Width, lblTitle.Width }.Sum();
 
-            this.Controls.Add(pbClose);
-            this.Controls.Add(pbIcon);
-            this.Controls.Add(lblTitle);
+            Controls.Add(pbClose);
+            Controls.Add(pbIcon);
+            Controls.Add(lblTitle);
 
             MinimumSize = new Size(w, h);
             MaximumSize = new Size(int.MaxValue, h);
