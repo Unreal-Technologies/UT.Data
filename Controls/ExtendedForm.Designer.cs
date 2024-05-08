@@ -37,6 +37,8 @@ namespace UT.Data.Controls
             // 
             // infoBar1
             // 
+            infoBar1.BackColor = Color.LightGoldenrodYellow;
+            infoBar1.Dock = DockStyle.Top;
             infoBar1.Location = new Point(0, 0);
             infoBar1.MaximumSize = new Size(int.MaxValue, 50);
             infoBar1.MinimumSize = new Size(75, 50);

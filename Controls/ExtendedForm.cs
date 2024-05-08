@@ -46,13 +46,6 @@ namespace UT.Data.Controls
             }
 
             TransparencyKey = RadialTransform.TransparencyKey;
-            this.RadialTransform(
-                25,
-                x => x.GetType() != typeof(GdiLabel) && x.GetType() != typeof(Label)
-            ).BorderTransform(
-                BorderStyle.FixedSingle,
-                Color.Gray
-            );
         }
         #endregion //Constructors
 
