@@ -1,5 +1,4 @@
 ﻿using UT.Data.Controls.Gdi;
-using UT.Data.Extensions;
 
 namespace UT.Data.Controls
 {
@@ -52,6 +51,7 @@ namespace UT.Data.Controls
             Font = new Font(FontFamily.GenericMonospace, 9);
             title = string.Empty;
             text = string.Empty;
+            
 
             InitializeComponent();
 

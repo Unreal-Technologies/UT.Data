@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System;
 
 namespace UT.Data.Extensions
 {
@@ -12,6 +13,16 @@ namespace UT.Data.Extensions
         public static string AsString(this byte[] value, Encoding encoding)
         {
             return encoding.GetString(value);
+        }
+
+        public static byte[] ToBase64(this byte[] value)
+        {
+            return Convert.ToBase64String(value).AsBytes();
+        }
+
+        public static byte[] FromBase64(this byte[] value)
+        {
+            return Convert.FromBase64String(value.AsString());
         }
     }
 }

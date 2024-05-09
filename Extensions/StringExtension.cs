@@ -80,7 +80,7 @@ namespace UT.Data.Extensions
                     {
                         continue;
                     }
-                    return (T)values.First(x => x.ToString().Equals(mi.Name, StringComparison.CurrentCultureIgnoreCase));
+                    return values.First(x => x.ToString().Equals(mi.Name, StringComparison.CurrentCultureIgnoreCase));
                 }
             }
 

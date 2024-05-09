@@ -9,7 +9,7 @@
         {
             TValue[] data = [.. obj.Values];
             int? index = Array.IndexOf(data, after);
-            if (index == null)
+            if (index == -1)
             {
                 return;
             }
@@ -22,7 +22,7 @@
         {
             TKey[] data = [.. obj.Keys];
             int? index = Array.IndexOf(data, after);
-            if (index == null)
+            if (index == -1)
             {
                 return;
             }
@@ -37,7 +37,7 @@
         {
             TValue[] data = [.. obj.Values];
             int? index = Array.IndexOf(data, before);
-            if (index == null)
+            if (index == -1)
             {
                 return;
             }
@@ -50,7 +50,7 @@
         {
             TKey[] data = [.. obj.Keys];
             int? index = Array.IndexOf(data, before);
-            if (index == null)
+            if (index == -1)
             {
                 return;
             }
