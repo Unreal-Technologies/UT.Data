@@ -1,7 +1,7 @@
 ﻿namespace UT.Data.Controls.Custom
 {
-    public class Gridview<Tid> : Panel
-        where Tid : struct
+    public class Gridview<Tdata> : Panel
+        where Tdata : class
     {
         #region Constants
         private new const int Padding = 3;
@@ -12,15 +12,10 @@
         {
             Left, Right
         }
-
-        public enum Alignment
-        {
-            Left, Right, Center
-        }
         #endregion //Enums
 
         #region Delegates
-        public delegate void ClickHandler(Tid? id);
+        public delegate void ClickHandler(Guid? id);
         #endregion //Delegates
 
         #region Events
@@ -30,12 +25,14 @@
         #endregion //Events
 
         #region Members
-        private readonly List<Column> columns;
-        private readonly List<Tuple<Point, Control?, Alignment, int>> fields;
-        private readonly List<Row> rows;
+        private readonly List<GvColumn> columns;
+        private readonly List<Tuple<Point, Control?, Gridview.Alignment, int>> fields;
+        private readonly List<Gridview.Row> rows;
         private Dictionary<int, int> columnSizes;
         private Dictionary<int, int> rowSizes;
         private readonly Button add;
+        private IEnumerable<Tdata>? data;
+        private readonly Func<Tdata, Guid> idValue;
         #endregion //Members
 
         #region Properties
@@ -43,8 +40,10 @@
         #endregion //Properties
 
         #region Constructors
-        public Gridview() : base()
+        public Gridview(Func<Tdata, Guid> idValue) : base()
         {
+            this.idValue = idValue;
+
             columns = [];
             fields = [];
             columnSizes = [];
@@ -68,50 +67,96 @@
         #endregion //Constructors
 
         #region Public Methods
-        public void AddRow(Row row)
+        public void Dataset(IEnumerable<Tdata> data)
         {
-            rows.Add(row);
+            this.data = data;
+            Reload();
         }
 
-        public void SetRows(Row[] rows)
+        public GvColumn Column(string text, Func<Tdata, string> value)
         {
-            ClearControlsExceptHeader();
-            this.rows.Clear();
-            this.rows.AddRange(rows);
+            return new GvColumn(text, value);
         }
 
-        public void SetColumns(Column[] columns)
+        public GvColumn Column(string text, Func<Tdata, string> value, Gridview.Alignment alignment)
+        {
+            return new GvColumn(text, value, alignment);
+        }
+
+        public GvColumn Column(string text, Func<Tdata, string> value, Gridview.Alignment alignment, EventHandler eventHandler)
+        {
+            return new GvColumn(text, value, alignment, eventHandler);
+        }
+
+        public GvColumn Column(string text, Func<Tdata, string> value, EventHandler eventHandler)
+        {
+            return new GvColumn(text, value, eventHandler);
+        }
+
+        public void SetColumns(GvColumn[] columns)
         {
             this.columns.Clear();
             this.columns.AddRange(columns);
         }
+        #endregion //Public Methods
 
-        public void AddColumn(Column column)
+        #region Private Methods
+        private void Reload()
         {
-            columns.Add(column);
+            Clear();
+            if (data == null)
+            {
+                return;
+            }
+            foreach (Tdata inputData in data)
+            {
+                Gridview.Row row = new()
+                {
+                    ID = idValue(inputData),
+                    Edit = OnEdit != null,
+                    Remove = OnRemove != null
+                };
+
+                foreach (GvColumn column in columns)
+                {
+                    Gridview.Cell cell = new()
+                    {
+                        Text = column.Value(inputData),
+                        TextAlignment = column.Alignment
+                    };
+
+                    row.Cells.Add(cell);
+                }
+
+                AddRow(row);
+            }
+            Render();
         }
 
-        public void Clear()
+        private void AddRow(Gridview.Row row)
+        {
+            rows.Add(row);
+        }
+
+        private void Clear()
         {
             ClearControlsExceptHeader();
-            this.rows.Clear();
+            rows.Clear();
         }
 
-        public void Render()
+        private void Render()
         {
             ComposeHeader();
             ComposeRows();
         }
-        #endregion //Public Methods
 
-        #region Private Methods
         private void ClearControlsExceptHeader()
         {
             foreach (Control? c in fields.Where(x => x.Item1.Y >= 1).Select(x => x.Item2))
             {
                 Controls.Remove(c);
             }
-            Tuple<Point, Control?, Alignment, int>[] header = fields.Where(x => x.Item1.Y == 0).ToArray();
+            Tuple<Point, Control?, Gridview.Alignment, int>[] header = fields.Where(x => x.Item1.Y == 0).ToArray();
             fields.Clear();
             fields.AddRange(header);
         }
@@ -123,7 +168,7 @@
 
             for (int r = 0; r < rows.Count; r++)
             {
-                Row row = rows[r];
+                Gridview.Row row = rows[r];
 
                 if (offset != 0)
                 {
@@ -131,7 +176,7 @@
                     {
                         Image = Resources.Pencil,
                         Size = Resources.Pencil.Size,
-                        Enabled = row.Edit == null || row.Edit == true,
+                        Enabled = row.Edit == null || row.Edit.Value,
                         FlatStyle = FlatStyle.Flat
                     };
                     edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
@@ -141,23 +186,23 @@
                     {
                         Image = Resources.Delete,
                         Size = Resources.Delete.Size,
-                        Enabled = row.Remove == null || row.Remove == true,
+                        Enabled = row.Remove == null || row.Remove.Value,
                         FlatStyle = FlatStyle.Flat
                     };
                     remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
                     remove.FlatAppearance.BorderSize = 0;
 
-                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(0, r + i), edit, Alignment.Left, 1));
+                    fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(0, r + i), edit, Gridview.Alignment.Left, 1));
                     Controls.Add(edit);
 
-                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(1, r + i), remove, Alignment.Left, 1));
+                    fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(1, r + i), remove, Gridview.Alignment.Left, 1));
                     Controls.Add(remove);
                 }
 
                 int length = row.Cells.Count;
                 for (int c = 0; c < length; c++)
                 {
-                    Cell cell = row.Cells[c];
+                    Gridview.Cell cell = row.Cells[c];
                     int index = c + offset;
 
                     Label l = new()
@@ -172,13 +217,13 @@
                     {
                         l.ForeColor = cell.Color.Value;
                     }
-                    Alignment alignment = Alignment.Left;
+                    Gridview.Alignment alignment = Gridview.Alignment.Left;
                     if (cell.TextAlignment != null)
                     {
                         alignment = cell.TextAlignment.Value;
                     }
 
-                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(index, r + i), l, alignment, 1));
+                    fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(index, r + i), l, alignment, 1));
                     Controls.Add(l);
                 }
 
@@ -188,7 +233,7 @@
                     {
                         Image = Resources.Pencil,
                         Size = Resources.Pencil.Size,
-                        Enabled = row.Edit == null || row.Edit == true,
+                        Enabled = row.Edit == null || row.Edit.Value,
                         FlatStyle = FlatStyle.Flat
                     };
                     edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
@@ -198,16 +243,16 @@
                     {
                         Image = Resources.Delete,
                         Size = Resources.Delete.Size,
-                        Enabled = row.Remove == null || row.Remove == true,
+                        Enabled = row.Remove == null || row.Remove.Value,
                         FlatStyle = FlatStyle.Flat
                     };
                     remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
                     remove.FlatAppearance.BorderSize = 0;
 
-                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(length + 0, r + i), edit, Alignment.Left, 1));
+                    fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(length + 0, r + i), edit, Gridview.Alignment.Left, 1));
                     Controls.Add(edit);
 
-                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(length + 1, r + i), remove, Alignment.Left, 1));
+                    fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(length + 1, r + i), remove, Gridview.Alignment.Left, 1));
                     Controls.Add(remove);
                 }
             }
@@ -217,18 +262,20 @@
 
         private void ComposeHeader()
         {
+            add.Enabled = OnAdd != null;
+
             fields.Clear();
             Controls.Clear();
             Controls.Add(add);
             int offset = ControlLocation == ControlLocations.Left ? 2 : 0;
             if (offset != 0)
             {
-                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(0, 0), add, Alignment.Center, 2));
-                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(1, 0), null, Alignment.Left, 1));
+                fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(0, 0), add, Gridview.Alignment.Center, 2));
+                fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(1, 0), null, Gridview.Alignment.Left, 1));
             }
 
             int i = 0;
-            foreach (Column column in columns)
+            foreach (GvColumn column in columns)
             {
                 int index = i + offset;
 
@@ -237,7 +284,12 @@
                     Text = column.Text,
                     Font = new Font(Font, FontStyle.Bold)
                 };
-                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(index, 0), l, Alignment.Center, 1));
+                if (column.HasClickEvent)
+                {
+                    l.Click += (object? sender, EventArgs e) => { data = column.Invoke(data); Reload(); };
+                    l.ForeColor = Color.Blue;
+                }
+                fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(index, 0), l, Gridview.Alignment.Center, 1));
                 Controls.Add(l);
 
                 i++;
@@ -245,8 +297,7 @@
 
             if (offset == 0)
             {
-                //fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(i + 0, 0), null, Alignment.Left, 1));
-                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(i + 1, 0), add, Alignment.Center, 2));
+                fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(i + 1, 0), add, Gridview.Alignment.Center, 2));
             }
 
             ComposeSizes();
@@ -279,7 +330,7 @@
                     {
                         if (s == 0)
                         {
-                            if (columnsBuffer.TryGetValue(x+s, out int valueX))
+                            if (columnsBuffer.TryGetValue(x + s, out int valueX))
                             {
                                 columnsBuffer[x + s] = Math.Max(valueX, size.Width);
                             }
@@ -320,7 +371,7 @@
 
         private void PositionControls()
         {
-            int padding = Gridview<Tid>.Padding;
+            int padding = Padding;
             Dictionary<int, int> rowsBuffer = rowSizes;
             Dictionary<int, int> columnsBuffer = columnSizes;
 
@@ -336,36 +387,36 @@
                     Point index = new(x, y);
                     Size size = new(columnsBuffer[x], rowsBuffer[y]);
 
-                    Tuple<Control?, Alignment, int>? data = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment, int>(x.Item2, x.Item3, x.Item4)).FirstOrDefault();
-                    if (data == null)
+                    Tuple<Control?, Gridview.Alignment, int>? fieldData = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Gridview.Alignment, int>(x.Item2, x.Item3, x.Item4)).FirstOrDefault();
+                    if (fieldData == null)
                     {
                         continue;
                     }
 
-                    int span = data.Item3;
-                    if(span > 1)
+                    int span = fieldData.Item3;
+                    if (span > 1)
                     {
-                        for(int s=1; s<span; s++)
+                        for (int s = 1; s < span; s++)
                         {
                             int w = size.Width + columnsBuffer[x + s];
                             size = new Size(w, size.Height);
                         }
                     }
 
-                    Control? control = data.Item1;
-                    Alignment alignment = data.Item2;
+                    Control? control = fieldData.Item1;
+                    Gridview.Alignment alignment = fieldData.Item2;
 
                     if (control != null)
                     {
                         control.Anchor = AnchorStyles.Left | AnchorStyles.Top;
                         control.Location = new Point(offsetX, offsetY + (size.Height - control.Height) / 2); //Default Left Align
-                        if (alignment == Alignment.Right)
+                        if (alignment == Gridview.Alignment.Right)
                         {
                             int baseX = control.Location.X;
                             int newX = baseX + (size.Width - control.Width);
                             control.Location = new Point(newX, control.Location.Y);
                         }
-                        else if (alignment == Alignment.Center)
+                        else if (alignment == Gridview.Alignment.Center)
                         {
                             int baseX = control.Location.X;
                             int newX = baseX + (size.Width - control.Width) / 2;
@@ -381,7 +432,6 @@
                         }
                     }
 
-
                     offsetX += size.Width + padding;
                 }
                 offsetY += rowsBuffer.Values.Max() + padding;
@@ -391,7 +441,7 @@
 
         private void DrawHorizontalLines(Graphics g)
         {
-            int padding = Gridview<Tid>.Padding;
+            int padding = Padding;
             Pen p = Pens.Black;
             int w = columnSizes.Values.Sum() + columnSizes.Count * padding;
 
@@ -405,7 +455,7 @@
 
         private void DrawVerticalLines(Graphics g)
         {
-            int padding = Gridview<Tid>.Padding;
+            int padding = Padding;
             Pen p = Pens.Black;
             int h = rowSizes.Values.Sum() + rowSizes.Count * padding;
 
@@ -432,12 +482,104 @@
         }
         #endregion //Overrides
 
+        public class GvEventArgs(IEnumerable<Tdata>? data) : EventArgs
+        {
+            #region Properties
+            public IEnumerable<Tdata>? Data { get; set; } = data;
+            #endregion //Properties
+        }
+
+        public class GvSorting
+        {
+            #region Constructors
+            protected GvSorting() { }
+            #endregion //Constructors
+
+            #region Members
+            private static string? last = null;
+            private static int count = 0;
+            #endregion //Members
+
+            #region Protected Methods
+            protected static (Gridview<Tdata>.GvEventArgs, Gridview<Tdata>.GvColumn, bool, int) Data(object? sender, EventArgs e)
+            {
+                if (e is Gridview<Tdata>.GvEventArgs ea && sender is Gridview<Tdata>.GvColumn column)
+                {
+                    bool isChanged = last != column.Text;
+                    if (isChanged)
+                    {
+                        count = 0;
+                    }
+                    int direction = count % 2 == 0 ? 1 : -1;
+
+                    count++;
+                    last = column.Text;
+
+                    return (ea, column, isChanged, direction);
+                }
+                return default;
+            }
+            #endregion //Protected Methods
+        }
+
+        public class GvColumn(string text, Func<Tdata, string> value)
+        {
+            #region Constructors
+            public GvColumn(string text, Func<Tdata, string> value, Gridview.Alignment alignment) 
+                : this(text, value)
+            {
+                Alignment = alignment;
+            }
+
+            public GvColumn(string text, Func<Tdata, string> value, Gridview.Alignment alignment, EventHandler eventHandler) 
+                : this(text, value, eventHandler)
+            {
+                Alignment = alignment;
+            }
+
+            public GvColumn(string text, Func<Tdata, string> value, EventHandler eventHandler) 
+                : this(text, value)
+            {
+                Click += eventHandler;
+            }
+            #endregion //Constructors
+
+            #region Events
+            public event EventHandler? Click;
+            #endregion //Events
+
+            #region Properties
+            internal Func<Tdata, string> Value { get; set; } = value;
+            public Gridview.Alignment Alignment { get; set; } = Gridview.Alignment.Left;
+            public string? Text { get; set; } = text;
+            public bool HasClickEvent { get { return Click != null; } }
+            #endregion //Properties
+
+            internal IEnumerable<Tdata>? Invoke(IEnumerable<Tdata>? data)
+            {
+                GvEventArgs gvEventArgs = new(data);
+
+                Click?.Invoke(this, gvEventArgs);
+                return gvEventArgs.Data;
+            }
+        }
+    }
+
+    public class Gridview
+    {
+        #region Enums
+        public enum Alignment
+        {
+            Left, Right, Center
+        }
+        #endregion //Enums
+
         #region Classes
         public class Row
         {
             #region Properties
             public List<Cell> Cells { get; set; }
-            public Tid? ID { get; set; }
+            public Guid? ID { get; set; }
             public bool? Remove { get; set; }
             public bool? Edit { get; set; }
             #endregion //Properties
@@ -456,13 +598,6 @@
             public string? Text { get; set; }
             public Color? Color { get; set; }
             public FontStyle? FontStyle { get; set; }
-        }
-
-        public class Column
-        {
-            #region Properties
-            public string? Text { get; set; }
-            #endregion //Properties
         }
         #endregion //Classes
     }
