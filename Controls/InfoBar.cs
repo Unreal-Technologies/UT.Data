@@ -7,7 +7,7 @@ namespace UT.Data.Controls
         #region Members
         private readonly PictureBox pbClose;
         private readonly PictureBox pbIcon;
-        private readonly Label lblTitle;
+        private readonly Label lblTitle, lblSubtitle;
         #endregion //Members
 
         #region Properties
@@ -19,7 +19,17 @@ namespace UT.Data.Controls
             { 
                 lblTitle.Text = value; 
                 lblTitle.Size = lblTitle.PreferredSize; 
-                lblTitle.BringToFront(); 
+                PositionTitle(); 
+            }
+        }
+
+        public string Subtitle
+        {
+            get { return lblSubtitle.Text; }
+            set 
+            { 
+                lblSubtitle.Text = value; 
+                lblSubtitle.Size = lblSubtitle.PreferredSize; 
                 PositionTitle(); 
             }
         }
@@ -52,12 +62,20 @@ namespace UT.Data.Controls
                 ForeColor = SystemColors.Highlight
             };
 
+            lblSubtitle = new Label()
+            {
+                Location = new Point(50, 0),
+                Font = new Font(Font.FontFamily, 10, FontStyle.Bold),
+                ForeColor = Color.Red,
+            };
+
             int h = new int[] { pbClose.Height, pbIcon.Height, lblTitle.Height }.OrderByDescending(x => x).FirstOrDefault();
             int w = new int[] { pbClose.Width, pbIcon.Width, lblTitle.Width }.Sum();
 
-            this.Controls.Add(pbClose);
-            this.Controls.Add(pbIcon);
-            this.Controls.Add(lblTitle);
+            Controls.Add(pbClose);
+            Controls.Add(pbIcon);
+            Controls.Add(lblTitle);
+            Controls.Add(lblSubtitle);
 
             MinimumSize = new Size(w, h);
             MaximumSize = new Size(int.MaxValue, h);
@@ -88,7 +106,11 @@ namespace UT.Data.Controls
             int y = (pbIcon.Height - lblTitle.Height) / 2;
             int x = pbIcon.Width + 5;
 
-            lblTitle.Location = new Point(x, y);
+            lblTitle.Location = new Point(x, y - 8);
+            lblSubtitle.Location = new Point(x, y + 16);
+
+            lblTitle.BringToFront();
+            lblSubtitle.BringToFront();
         }
 
         private void InfoBar_ParentChanged(object? sender, EventArgs e)

@@ -61,6 +61,24 @@ namespace UT.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to server=127.0.0.1;port=3306;database=dnd-manager;user=root;password=;.
+        /// </summary>
+        internal static string DbConnectionString {
+            get {
+                return ResourceManager.GetString("DbConnectionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL.
+        /// </summary>
+        internal static string DbType {
+            get {
+                return ResourceManager.GetString("DbType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Delete {

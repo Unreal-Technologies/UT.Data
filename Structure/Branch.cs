@@ -35,10 +35,10 @@
             foreach (T branch in branchList)
             {
                 Branch<T> b = new(branch);
-                if (!this.branches.Contains(b) && this.branches.Find(x => x.ordinal.Equals(ordinal)) == null)
+                if (!branches.Contains(b) && branches.Find(x => x.ordinal.Equals(ordinal)) == null)
                 {
                     b.AddBranches(data);
-                    this.branches.Add(b);
+                    branches.Add(b);
                 }
             }
         }

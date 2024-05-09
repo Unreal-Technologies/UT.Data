@@ -1,11 +1,12 @@
-﻿using UT.Data.Helpers;
-using UT.Data.Extensions;
+﻿using UT.Data.Extensions;
+using UT.Data.Helpers;
 
 namespace UT.Data.Controls.Gdi
 {
     public class RadialTransform
     {
         #region Members
+        private static readonly Dictionary<string, PointF[]> memory = [];
         private readonly SizeF topLeftRadial;
         private readonly SizeF topRightRadial;
         private readonly SizeF bottomLeftRadial;
@@ -27,7 +28,7 @@ namespace UT.Data.Controls.Gdi
         public PointF[]? TR { get { return topRight; } }
         public PointF[]? BL { get { return bottomLeft; } }
         public PointF[]? BR { get { return bottomRight; } }
-        public Control Control { get { return this.control; } }
+        public Control Control { get { return control; } }
         public Dictionary<Control, RadialTransform> Children { get { return children; } }
         #endregion //Properties
 
@@ -140,6 +141,36 @@ namespace UT.Data.Controls.Gdi
             children = buffer;
         }
 
+        private static PointF[] CalculateArcCorner(SizeF size, RectangleF bounds, AlignmentHelper.Settings settings)
+        {
+            float x = settings.HAlign switch
+            {
+                AlignmentHelper.Settings.Horizontal.Left => 0,
+                AlignmentHelper.Settings.Horizontal.Right => bounds.Width,
+                _ => 0,
+            };
+            float y = settings.VAlign switch
+            {
+                AlignmentHelper.Settings.Vertical.Top => 0,
+                AlignmentHelper.Settings.Vertical.Bottom => bounds.Height,
+                _ => 0,
+            };
+
+            string key = size.Width + "|" + size.Height + "|" + x + "|" + y;
+            if(!memory.TryGetValue(key, out PointF[]? value))
+            {
+                PointF[] data = AlignmentHelper.CalculateArcCorner(
+                    size,
+                    bounds,
+                    settings
+                );
+                value = data;
+                memory.Add(key, value);
+            }
+
+            return value;
+        }
+
         private void CalculatePoints()
         {
             bool tlSet = !topLeftRadial.IsEmpty;
@@ -148,7 +179,7 @@ namespace UT.Data.Controls.Gdi
             bool brSet = !bottomRightRadial.IsEmpty;
 
             RectangleF bounds = control.DisplayRectangle;
-            topLeft = tlSet ? AlignmentHelper.CalculateArcCorner(
+            topLeft = tlSet ? CalculateArcCorner(
                 topLeftRadial,
                 bounds,
                 new AlignmentHelper.Settings(
@@ -156,7 +187,7 @@ namespace UT.Data.Controls.Gdi
                     AlignmentHelper.Settings.Vertical.Top
                 )
             ) : [];
-            topRight = trSet ? AlignmentHelper.CalculateArcCorner(
+            topRight = trSet ? CalculateArcCorner(
                 topRightRadial,
                 bounds,
                 new AlignmentHelper.Settings(
@@ -164,7 +195,7 @@ namespace UT.Data.Controls.Gdi
                     AlignmentHelper.Settings.Vertical.Top
                 )
             ) : [];
-            bottomLeft = blSet ? AlignmentHelper.CalculateArcCorner(
+            bottomLeft = blSet ? CalculateArcCorner(
                 bottomLeftRadial,
                 bounds,
                 new AlignmentHelper.Settings(
@@ -172,7 +203,7 @@ namespace UT.Data.Controls.Gdi
                     AlignmentHelper.Settings.Vertical.Bottom
                 )
             ) : [];
-            bottomRight = brSet ? AlignmentHelper.CalculateArcCorner(
+            bottomRight = brSet ? CalculateArcCorner(
                 bottomRightRadial,
                 bounds,
                 new AlignmentHelper.Settings(

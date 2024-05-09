@@ -152,8 +152,7 @@ namespace UT.Data.Controls
 
         private void Validated_SizeChanged(object? sender, EventArgs e)
         {
-            int width = Width;
-            control.Width = width - symbol.Width - Validated<T>.InterControlPadding;
+            control.MinimumSize = new Size(Width - symbol.Width - InterControlPadding, Height);
         }
         #endregion //Private Methods
     }

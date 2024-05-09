@@ -30,6 +30,8 @@ namespace UT.Data.Efc
         private readonly Configuration configuration = configuration;
         #endregion //Members
 
+        public virtual bool Migrate() { return false; }
+
         #region Overrides
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

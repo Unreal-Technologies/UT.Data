@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text;
+using UT.Data.Efc;
 using UT.Data.Encryption;
 using UT.Data.IO;
 
@@ -41,7 +42,7 @@ namespace UT.Data.Modlet
         #endregion //Constructors
 
         #region Public Methods
-        public bool Register(IModlet module, DbContext? context)
+        public bool Register(IModlet module, ServerContext? context)
         {
             if(modules == null)
             {

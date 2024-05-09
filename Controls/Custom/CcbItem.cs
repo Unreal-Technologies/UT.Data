@@ -17,8 +17,8 @@ namespace UT.Data.Controls.Custom
 
         public CcbItem(string name, int val)
         {
-            this.Name = name;
-            this.Value = val;
+            Name = name;
+            Value = val;
         }
         #endregion //Constructors
 

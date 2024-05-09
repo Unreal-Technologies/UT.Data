@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UT.Data.Controls
+﻿namespace UT.Data.Controls
 {
     public partial class ExtendedForm
     {
@@ -37,6 +31,8 @@ namespace UT.Data.Controls
             // 
             // infoBar1
             // 
+            infoBar1.BackColor = Color.LightGoldenrodYellow;
+            infoBar1.Dock = DockStyle.Top;
             infoBar1.Location = new Point(0, 0);
             infoBar1.MaximumSize = new Size(int.MaxValue, 50);
             infoBar1.MinimumSize = new Size(75, 50);

@@ -18,13 +18,13 @@ namespace UT.Data.Extensions
 
         public static string Repeat(this string value, int times)
         {
-            string sOut = "";
+            StringBuilder sb = new();
             for (int i = 0; i < times; i++)
             {
-                sOut += value;
+                sb.Append(value);
             }
 
-            return sOut;
+            return sb.ToString();
         }
 
         public static bool AsBoolean(this string value)
@@ -80,7 +80,7 @@ namespace UT.Data.Extensions
                     {
                         continue;
                     }
-                    return (T)values.First(x => x.ToString().Equals(mi.Name, StringComparison.CurrentCultureIgnoreCase));
+                    return values.First(x => x.ToString().Equals(mi.Name, StringComparison.CurrentCultureIgnoreCase));
                 }
             }
 

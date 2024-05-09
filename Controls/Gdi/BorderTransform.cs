@@ -152,7 +152,7 @@ namespace UT.Data.Controls.Gdi
                     brOffset.Length > 0 ? brOffset[2].IncrementX(2) : new PointF(bounds.Right - location.X, bounds.Bottom - location.Y)
                 }.IncrementY(-1).ToArray(),
             ];
-            this.lines = [.. linesBuffer];
+            lines = [.. linesBuffer];
 
             if (radialTransform.Control.HasChildren)
             {
