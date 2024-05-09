@@ -69,7 +69,6 @@
         public void AddRow(Row row)
         {
             rows.Add(row);
-            ComposeRows();
         }
 
         public void SetRows(Row[] rows)
@@ -77,20 +76,29 @@
             ClearControlsExceptHeader();
             this.rows.Clear();
             this.rows.AddRange(rows);
-            ComposeRows();
         }
 
         public void SetColumns(Column[] columns)
         {
             this.columns.Clear();
             this.columns.AddRange(columns);
-            ComposeHeader();
         }
 
         public void AddColumn(Column column)
         {
             columns.Add(column);
+        }
+
+        public void Clear()
+        {
+            ClearControlsExceptHeader();
+            this.rows.Clear();
+        }
+
+        public void Render()
+        {
             ComposeHeader();
+            ComposeRows();
         }
         #endregion //Public Methods
 
