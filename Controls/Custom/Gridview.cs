@@ -31,7 +31,7 @@
 
         #region Members
         private readonly List<Column> columns;
-        private readonly List<Tuple<Point, Control?, Alignment>> fields;
+        private readonly List<Tuple<Point, Control?, Alignment, int>> fields;
         private readonly List<Row> rows;
         private Dictionary<int, int> columnSizes;
         private Dictionary<int, int> rowSizes;
@@ -57,9 +57,11 @@
             add = new Button
             {
                 Image = Resources.Plus,
-                Size = Resources.Plus.Size
+                Size = Resources.Plus.Size,
+                FlatStyle = FlatStyle.Flat
             };
             add.Click += delegate (object? sender, EventArgs e) { OnAdd?.Invoke(null); };
+            add.FlatAppearance.BorderSize = 0;
 
             SetColumns([]);
         }
@@ -109,7 +111,7 @@
             {
                 Controls.Remove(c);
             }
-            Tuple<Point, Control?, Alignment>[] header = fields.Where(x => x.Item1.Y == 0).ToArray();
+            Tuple<Point, Control?, Alignment, int>[] header = fields.Where(x => x.Item1.Y == 0).ToArray();
             fields.Clear();
             fields.AddRange(header);
         }
@@ -125,22 +127,30 @@
 
                 if (offset != 0)
                 {
-                    Button edit = new();
+                    Button edit = new()
+                    {
+                        Image = Resources.Pencil,
+                        Size = Resources.Pencil.Size,
+                        Enabled = row.Edit == null || row.Edit == true,
+                        FlatStyle = FlatStyle.Flat
+                    };
                     edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
-                    edit.Image = Resources.Pencil;
-                    edit.Size = Resources.Pencil.Size;
-                    edit.Enabled = row.Edit == null || row.Edit == true;
+                    edit.FlatAppearance.BorderSize = 0;
 
-                    Button remove = new();
+                    Button remove = new()
+                    {
+                        Image = Resources.Delete,
+                        Size = Resources.Delete.Size,
+                        Enabled = row.Remove == null || row.Remove == true,
+                        FlatStyle = FlatStyle.Flat
+                    };
                     remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
-                    remove.Image = Resources.Delete;
-                    remove.Size = Resources.Delete.Size;
-                    remove.Enabled = row.Remove == null || row.Remove == true;
+                    remove.FlatAppearance.BorderSize = 0;
 
-                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, r + i), edit, Alignment.Left));
+                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(0, r + i), edit, Alignment.Left, 1));
                     Controls.Add(edit);
 
-                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, r + i), remove, Alignment.Left));
+                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(1, r + i), remove, Alignment.Left, 1));
                     Controls.Add(remove);
                 }
 
@@ -168,22 +178,36 @@
                         alignment = cell.TextAlignment.Value;
                     }
 
-                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, r + i), l, alignment));
+                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(index, r + i), l, alignment, 1));
                     Controls.Add(l);
                 }
 
                 if (offset == 0)
                 {
-                    Button edit = new();
+                    Button edit = new()
+                    {
+                        Image = Resources.Pencil,
+                        Size = Resources.Pencil.Size,
+                        Enabled = row.Edit == null || row.Edit == true,
+                        FlatStyle = FlatStyle.Flat
+                    };
                     edit.Click += delegate (object? sender, EventArgs e) { OnEdit?.Invoke(row.ID); };
+                    edit.FlatAppearance.BorderSize = 0;
 
-                    Button remove = new();
+                    Button remove = new()
+                    {
+                        Image = Resources.Delete,
+                        Size = Resources.Delete.Size,
+                        Enabled = row.Remove == null || row.Remove == true,
+                        FlatStyle = FlatStyle.Flat
+                    };
                     remove.Click += delegate (object? sender, EventArgs e) { OnRemove?.Invoke(row.ID); };
+                    remove.FlatAppearance.BorderSize = 0;
 
-                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 0, r + i), edit, Alignment.Left));
+                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(length + 0, r + i), edit, Alignment.Left, 1));
                     Controls.Add(edit);
 
-                    fields.Add(new Tuple<Point, Control?, Alignment>(new Point(length + 1, r + i), remove, Alignment.Left));
+                    fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(length + 1, r + i), remove, Alignment.Left, 1));
                     Controls.Add(remove);
                 }
             }
@@ -199,8 +223,8 @@
             int offset = ControlLocation == ControlLocations.Left ? 2 : 0;
             if (offset != 0)
             {
-                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(0, 0), add, Alignment.Left));
-                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(1, 0), null, Alignment.Left));
+                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(0, 0), add, Alignment.Center, 2));
+                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(1, 0), null, Alignment.Left, 1));
             }
 
             int i = 0;
@@ -213,7 +237,7 @@
                     Text = column.Text,
                     Font = new Font(Font, FontStyle.Bold)
                 };
-                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(index, 0), l, Alignment.Center));
+                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(index, 0), l, Alignment.Center, 1));
                 Controls.Add(l);
 
                 i++;
@@ -221,8 +245,8 @@
 
             if (offset == 0)
             {
-                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 0, 0), null, Alignment.Left));
-                fields.Add(new Tuple<Point, Control?, Alignment>(new Point(i + 1, 0), add, Alignment.Left));
+                //fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(i + 0, 0), null, Alignment.Left, 1));
+                fields.Add(new Tuple<Point, Control?, Alignment, int>(new Point(i + 1, 0), add, Alignment.Center, 2));
             }
 
             ComposeSizes();
@@ -242,6 +266,7 @@
                 {
                     Point location = new(x, y);
                     Control? control = fields.Where(x => x.Item1.X == location.X && x.Item1.Y == location.Y).Select(x => x.Item2).FirstOrDefault();
+                    int span = fields.Where(x => x.Item1.X == location.X && x.Item1.Y == location.Y).Select(x => x.Item4).FirstOrDefault();
 
                     Size size = new(0, 0);
                     if (control != null)
@@ -250,13 +275,30 @@
                         size = control.Size;
                     }
 
-                    if (columnsBuffer.TryGetValue(x, out int valueX))
+                    for (int s = 0; s < span; s++)
                     {
-                        columnsBuffer[x] = Math.Max(valueX, size.Width);
-                    }
-                    else
-                    {
-                        columnsBuffer.Add(x, size.Width);
+                        if (s == 0)
+                        {
+                            if (columnsBuffer.TryGetValue(x+s, out int valueX))
+                            {
+                                columnsBuffer[x + s] = Math.Max(valueX, size.Width);
+                            }
+                            else
+                            {
+                                columnsBuffer.Add(x + s, size.Width);
+                            }
+                        }
+                        else
+                        {
+                            if (columnsBuffer.TryGetValue(x, out int valueX))
+                            {
+                                columnsBuffer[x + s] = Math.Max(valueX, size.Width);
+                            }
+                            else
+                            {
+                                columnsBuffer.Add(x + s, size.Width);
+                            }
+                        }
                     }
 
                     if (rowsBuffer.TryGetValue(y, out int valueY))
@@ -294,10 +336,20 @@
                     Point index = new(x, y);
                     Size size = new(columnsBuffer[x], rowsBuffer[y]);
 
-                    Tuple<Control?, Alignment>? data = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment>(x.Item2, x.Item3)).FirstOrDefault();
+                    Tuple<Control?, Alignment, int>? data = fields.Where(x => x.Item1.X == index.X && x.Item1.Y == index.Y).Select(x => new Tuple<Control?, Alignment, int>(x.Item2, x.Item3, x.Item4)).FirstOrDefault();
                     if (data == null)
                     {
                         continue;
+                    }
+
+                    int span = data.Item3;
+                    if(span > 1)
+                    {
+                        for(int s=1; s<span; s++)
+                        {
+                            int w = size.Width + columnsBuffer[x + s];
+                            size = new Size(w, size.Height);
+                        }
                     }
 
                     Control? control = data.Item1;
@@ -320,6 +372,16 @@
                             control.Location = new Point(newX, control.Location.Y);
                         }
                     }
+                    if (span > 1)
+                    {
+                        for (int s = 1; s < span; s++)
+                        {
+                            int w = size.Width - columnsBuffer[x + s];
+                            size = new Size(w, size.Height);
+                        }
+                    }
+
+
                     offsetX += size.Width + padding;
                 }
                 offsetY += rowsBuffer.Values.Max() + padding;
