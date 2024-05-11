@@ -287,7 +287,9 @@
                 if (column.HasClickEvent)
                 {
                     l.Click += (object? sender, EventArgs e) => { data = column.Invoke(data); Reload(); };
-                    l.ForeColor = Color.Blue;
+                    l.ForeColor = SystemColors.Highlight;
+                    l.MouseEnter += (object? sender, EventArgs e) => { Cursor = Cursors.Hand; };
+                    l.MouseLeave += (object? sender, EventArgs e) => { Cursor = Cursors.Default; };
                 }
                 fields.Add(new Tuple<Point, Control?, Gridview.Alignment, int>(new Point(index, 0), l, Gridview.Alignment.Center, 1));
                 Controls.Add(l);
