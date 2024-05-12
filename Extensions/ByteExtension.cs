@@ -24,5 +24,13 @@ namespace UT.Data.Extensions
         {
             return Convert.FromBase64String(value.AsString());
         }
+
+        public static MemoryStream ToStream(this byte[] value)
+        {
+            MemoryStream ms = new();
+            ms.Write(value, 0, value.Length);
+            ms.Position = 0;
+            return ms;
+        }
     }
 }
